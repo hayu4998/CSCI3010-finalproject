@@ -1,7 +1,8 @@
 #include "land.h"
 #include <cstdlib>
 #include <QtWidgets>
-
+#include <iostream>
+#include <QDebug>
 bool Land::player_ = false;
 
 Land::Land(){
@@ -17,7 +18,7 @@ Land::Land(bool start, int x, int y){
 
     if(start){
         resource_ = Resource::Forest;
-        Is_Occupied_ = true;
+        Is_Occupied_ = false;
         population_ = 50;
     }else{
         int rd = rand() % 3;
@@ -30,13 +31,13 @@ Land::Land(bool start, int x, int y){
 }
 
 QRectF Land::boundingRect() const{
-    return QRectF(25,15+20*11,400,100);
+    return QRectF(25+x_*width_,25+y_*width_,width_,width_);
 }
 
 QPainterPath Land::shape() const
 {
     QPainterPath path;
-    path.addRect(x_, y_, width_, width_);
+    path.addRect(25+x_*width_, 25+y_*width_, width_, width_);
     return path;
 }
 
@@ -46,11 +47,13 @@ void Land::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
 
     QBrush b = painter->brush();
     painter->setBrush(QBrush(color_.dark(option->state & QStyle::State_Sunken ? 120 : 100)));
-    painter->drawRect(QRectF(25+width_*x_, 100+width_*y_,width_,width_));
+    painter->drawRect(QRectF(25+width_*x_, 25+width_*y_,width_,width_));
     painter->setBrush(b);
 }
 
 void Land::mousePressEvent(QGraphicsSceneMouseEvent *event){
+
+    qDebug()<<"Mouse Press Detected";
 
     QGraphicsItem::mousePressEvent(event);
 
@@ -64,6 +67,7 @@ void Land::mousePressEvent(QGraphicsSceneMouseEvent *event){
         }
         color_ = C;
     }
+
     emit Land_Clicked(this);
     update();
 }

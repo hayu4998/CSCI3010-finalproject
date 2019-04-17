@@ -5,7 +5,7 @@
 #include <iostream>
 #include <QGraphicsScene>
 #include <QGraphicsView>
-
+#include "board.h"
 
 
 namespace Ui {
@@ -20,10 +20,16 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void Land_Clicked_Slot(Land * L);
+
+
 private:
     Ui::MainWindow *ui;
 
     QGraphicsScene * scene;
+
+
 };
 
 #endif // MAINWINDOW_H

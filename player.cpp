@@ -25,3 +25,7 @@ void Player::grow(){
     iron_ += 20*iron_mine_;
 }
 
+AI::AI(){
+    Player();
+}
+

@@ -3,7 +3,7 @@
 
 #include "board.h"
 
-Board::Board(bool p1, bool p2){
+Board::Board(){
     for(int i = 0; i < 8; i++){
         for(int j = 0; j < 8; j++){
             if(i==0 && j == 0){
@@ -15,18 +15,15 @@ Board::Board(bool p1, bool p2){
             }
         }
     }
+
+    P1_ = new Player;
+    P2_ = new Player;
+
+    A1_ = new AI;
+    A2_ = new AI;
+}
+
+void Board::setBoard(bool p1,bool p2){
     p1_ = p1;
     p2_ = p2;
-
-    if(p1 && p2){
-        P1_ = new Player;
-        P2_ = new Player;
-    }else if (p1 || p2){
-        P1_ = new Player;
-        A1_ = new AI;
-    }else{
-        A1_ = new AI;
-        A2_ = new AI;
-    }
-
 }

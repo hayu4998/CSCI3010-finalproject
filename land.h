@@ -5,6 +5,7 @@
 #include <QGraphicsItem>
 
 enum class Resource{Forest, Gold, Iron};
+
 class Land: public QObject, public QGraphicsItem{
 
     Q_OBJECT
@@ -14,6 +15,10 @@ public:
     Land();
 
     Land(bool, int x, int y);
+
+    int get_x(){return x_;}
+
+    int get_y(){return y_;}
 
     QRectF boundingRect() const override;
 

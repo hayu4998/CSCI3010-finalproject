@@ -7,17 +7,18 @@
 #include "land.h"
 #include "player.h"
 
-class Board : public QObject, public QGraphicsItem{
-    Q_OBJECT
+class Board{
 public:
 
-    Board(bool p1,bool p2);
+    Board();
+
+    void setBoard(bool p1,bool p2);
 
     void taketurn(bool p1, bool p2);
 
-private:
-
     Land *Play_board_[8][8];
+
+private:
 
     Player *P1_;
     Player *P2_;
