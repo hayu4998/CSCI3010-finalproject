@@ -1,0 +1,5 @@
+Feed Back: 
+Derek: 
+The game strategy is complex, you should have a pop window that explain the game rule. 
+Xiao: 
+The function of AI taking charge in the middle of the game is complex to implement and the game is already complex enough. I suggest you make that button a confirmation button for training soldier. 
