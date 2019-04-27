@@ -11,7 +11,7 @@ Player::Player(){
     gold_mine_ = 0;
     forest_ = 0;
     iron_mine_ = 0;
-
+    Owned_ = new std::vector<Land*>;
 }
 // keep tract of number of turn
 int Player::turn_ = 0;
@@ -25,7 +25,5 @@ void Player::grow(){
     iron_ += 20*iron_mine_;
 }
 
-AI::AI(){
-    Player();
-}
+
 

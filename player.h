@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include <QColor>
+#include "land.h"
+#include <vector>
 
 class Player:public QObject{
     Q_OBJECT
@@ -13,6 +15,8 @@ public:
     void transform_soilder(float gold);
 
     void grow();
+
+    void Add_Land(Land * L){Owned_ -> push_back(L);}
 
 signals:
 
@@ -38,12 +42,14 @@ private:
 
     static int turn_;
 
+    std::vector<Land*> *Owned_;
+
 };
 
 class AI: public Player{
 
 public:
-    AI();
+    AI():Player(){}
 
     void take_turn();
 

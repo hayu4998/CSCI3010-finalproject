@@ -22,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     Board * game = new Board;
 
+    Is_Start_Turn_ = true;
+
     qDebug()<<"Example status";
 
     for(int i = 0 ; i<8 ; i++){
@@ -34,11 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
         }
     }
 
-    //Land * test = new Land(false, 0,0);
-    //scene->addItem(test);
-
-
-
+    connect(this,&MainWindow::Start_Button_Clicked,game,&Board::Start_Button_Clicked_Slot);
 
 }
 
@@ -50,4 +48,14 @@ MainWindow::~MainWindow()
 void MainWindow::Land_Clicked_Slot(Land * L){
     qDebug()<< L->get_x();
     qDebug()<< L->get_y();
+}
+
+void MainWindow::on_Start_Button_clicked()
+{
+    qDebug()<<"Start Button click Detected";
+    if(Is_Start_Turn_){
+        QString s = "Finish Turn";
+        ui->Start_Button->setText(s);
+    }
+    emit Start_Button_Clicked();
 }
