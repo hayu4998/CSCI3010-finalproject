@@ -48,7 +48,7 @@ private:
 
     int y_;
 
-    const int width_ = 100;
+    const int width_ = 80;
 
     static bool player_;
 

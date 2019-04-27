@@ -69,6 +69,8 @@ void Land::mousePressEvent(QGraphicsSceneMouseEvent *event){
     }
 
     emit Land_Clicked(this);
+
+    player_ = !player_;
     update();
 }
 
