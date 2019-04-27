@@ -3,6 +3,7 @@
 #include <QWidget>
 #include <QColor>
 #include <QGraphicsItem>
+#include <vector>
 
 enum class Resource{Forest, Gold, Iron};
 
@@ -12,13 +13,19 @@ class Land: public QObject, public QGraphicsItem{
 
 public:
 
-    Land();
+    Land(){}
 
     Land(bool, int x, int y);
 
     int get_x(){return x_;}
 
     int get_y(){return y_;}
+
+    void Active_Land(bool p){p?Is_Active_Player1_ = true : Is_Active_Player2_ = true;}
+
+    void Occupy(){Is_Occupied_ = true;}
+
+    void switch_player(){player_ = !player_;}
 
     QRectF boundingRect() const override;
 
@@ -49,6 +56,10 @@ private:
     int y_;
 
     const int width_ = 80;
+
+    bool Is_Active_Player1_;
+
+    bool Is_Active_Player2_;
 
     static bool player_;
 

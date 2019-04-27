@@ -23,13 +23,17 @@ public:
 private slots:
     void Land_Clicked_Slot(Land * L);
 
+    void on_Start_Button_clicked();
+
+signals:
+    void Start_Button_Clicked();
 
 private:
     Ui::MainWindow *ui;
 
     QGraphicsScene * scene;
 
-
+    bool Is_Start_Turn_;
 };
 
 #endif // MAINWINDOW_H
