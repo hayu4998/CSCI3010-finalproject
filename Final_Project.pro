@@ -27,15 +27,15 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    board.cpp \
-    land.cpp \
-    player.cpp
+        board.cpp \
+        land.cpp \
+        player.cpp
 
 HEADERS += \
         mainwindow.h \
-    board.h \
-    land.h \
-    player.h
+        board.h \
+        land.h \
+        player.h
 
 FORMS += \
         mainwindow.ui

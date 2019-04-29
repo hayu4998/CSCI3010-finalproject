@@ -17,22 +17,35 @@ Land::Land(bool start, int x, int y){
 
     Is_Active_Player2_ = false;
 
-
     if(start){
-
         resource_ = Resource::Forest;
-        Is_Occupied_ = false;
+        Is_Occupied_ = true;
         population_ = 50;
-        y_ == 7? Is_Active_Player1_ = true: Is_Active_Player2_ = true;
-        Is_Active_Player1_? color_ = QColor(255,255,0):color_ = QColor(255,0,255);
+        if(y_ == 7) {
+            Is_Active_Player1_ = true;
+            belongs_ = 1;
+            color_ = QColor(255,255,0);
+        }else{
+            Is_Active_Player2_ = true;
+            belongs_ = 2;
+            color_ = QColor(255,0,255);
+        }
+
 
     }else{
-        int rd = rand() % 3;
-        rd == 0? resource_ = Resource::Forest:(rd == 1? resource_ = Resource::Gold:Resource::Iron);
+        int rd = rand() % 4;
+        if(rd == 0){
+            resource_ = Resource::Gold;
+        }else if(rd == 1){
+            resource_ = Resource::Iron;
+        }else{
+            resource_ = Resource::Forest;
+        }
         Is_Occupied_ = false;
         population_ = rand() % 50 +1;
         QColor C(255,255,255);
         color_ = C;
+        belongs_ = 0;
     }
 }
 
@@ -58,19 +71,19 @@ void Land::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
 
     painter->setBrush(b);
 
-    QString Display_text = "Population: " + QString::number(population_) + "\n";
+    QString Display_text = "People: " + QString::number(population_) + "\n";
 
 
 
     if(resource_ == Resource::Forest){
         Display_text += "Forest";
-        painter->drawText(QRectF(25+x_*width_,25+y_*width_,width_,width_),Qt::AlignLeft, Display_text);
+        painter->drawText(QRectF(25+x_*width_,25+y_*width_,width_,width_),Qt::AlignCenter, Display_text);
     }else if (resource_ == Resource::Gold){
         Display_text += "Gold Mine";
-        painter->drawText(QRectF(25+x_*width_,25+y_*width_,width_,width_),Qt::AlignLeft, Display_text);
+        painter->drawText(QRectF(25+x_*width_,25+y_*width_,width_,width_),Qt::AlignCenter, Display_text);
     }else{
         Display_text += "Iron";
-        painter->drawText(QRectF(25+x_*width_,25+y_*width_,width_,width_),Qt::AlignLeft, Display_text);
+        painter->drawText(QRectF(25+x_*width_,25+y_*width_,width_,width_),Qt::AlignCenter, Display_text);
     }
 
 
@@ -82,28 +95,43 @@ void Land::mousePressEvent(QGraphicsSceneMouseEvent *event){
     //qDebug()<<"Mouse Press Detected";
 
     QGraphicsItem::mousePressEvent(event);
-
+    //conqur empty land
     if(!Is_Occupied_ && ((Is_Active_Player1_ && player_) || (Is_Active_Player2_ && !player_))){
-        Is_Occupied_ = true;
+        //Is_Occupied_ = true;
 
         if(player_ && Is_Active_Player1_){
-            QColor C;
-            C = QColor(255,255,0);
-            color_ = C;
-            switch_player();
-            emit Land_Clicked(this);
+            emit Land_Clicked(this, player_);
         }else if(Is_Active_Player2_){
-            QColor C;
-            C = QColor(255,0,255);
-            color_ = C;
-            switch_player();
-            emit Land_Clicked(this);
+            emit Land_Clicked(this, player_);
         }
-
-
-
+    }
+    //conqur other player's land
+    if(Is_Occupied_ && ((belongs_ == 1) != player_)){
+        if((Is_Active_Player1_ && player_) || (Is_Active_Player2_ && !player_)){
+            if(player_ && Is_Active_Player1_){
+                emit Land_Clicked(this, player_);
+            }else if(Is_Active_Player2_){
+                emit Land_Clicked(this, player_);
+            }
+        }
     }
     update();
 }
 
-
+void Land::Set_Land(){
+    if(player_){
+        QColor C;
+        C = QColor(255,255,0);
+        color_ = C;
+        belongs_ = 1;
+        switch_player();
+    }else{
+        QColor C;
+        C = QColor(255,0,255);
+        color_ = C;
+        belongs_ = 2;
+        switch_player();
+    }
+    Is_Occupied_ = true;
+    update();
+}

@@ -15,19 +15,27 @@ public:
 
     void setBoard(bool p1,bool p2);
 
-    void taketurn();
+    void taketurn(bool type);
 
     void active_land_near_by(int i, int j);
 
     void switch_turn(){player_turn_ = !player_turn_;}
 
+    void update_resources(Land *L, bool type);
+
     Land *Play_board_[8][8];
+
+    QString Update_Player_Data(bool player_turn);
 
 public slots:
 
-    void Land_Clicked_Slot(Land *L);
+    void Land_Clicked_Slot(Land *L, bool player);
 
-    void Start_Button_Clicked_Slot();
+    void Start_Button_Clicked_Slot(bool p1, bool p2);
+
+signals:
+
+    void Update_Player_Data_Signal(QString Output, bool player);
 
 private:
 
@@ -45,6 +53,8 @@ private:
     Land *Stored_Land_;
 
     bool Is_Start_;
+
+    Land * Null_Land_;
 };
 
 #endif // BOARD_H

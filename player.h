@@ -16,7 +16,13 @@ public:
 
     void grow();
 
-    void Add_Land(Land * L){Owned_ -> push_back(L);}
+    void Add_Land(Land * L);
+
+    bool Battle_Lost(){return true;}
+
+    void Conquering_Land();
+
+    QString Output_Data();
 
 signals:
 
@@ -30,19 +36,19 @@ private:
 
     int iron_mine_;
 
-    float gold_;
+    int gold_;
 
     int population_;
 
     int lumber_;
 
-    int soilder_;
+    int soldier_;
 
-    float iron_;
+    int iron_;
 
     static int turn_;
 
-    std::vector<Land*> *Owned_;
+    static bool player_turn_;
 
 };
 
@@ -53,7 +59,6 @@ public:
 
     void take_turn();
 
-private:
     int target_;
 };
 

@@ -78,7 +78,7 @@
        <item>
         <widget class="QPushButton" name="Player1_Buy_Soilder_Button">
          <property name="text">
-          <string>Train Soilder</string>
+          <string>Train Soldier</string>
          </property>
         </widget>
        </item>
@@ -118,7 +118,7 @@
        <item>
         <widget class="QPushButton" name="Player2_Train_Soilder_Button">
          <property name="text">
-          <string>Train Soilder</string>
+          <string>Train Soldier</string>
          </property>
         </widget>
        </item>

@@ -6,7 +6,6 @@
 #include <vector>
 
 enum class Resource{Forest, Gold, Iron};
-
 class Land: public QObject, public QGraphicsItem{
 
     Q_OBJECT
@@ -21,11 +20,23 @@ public:
 
     int get_y(){return y_;}
 
+    Resource get_resource(){return resource_;}
+
+    int get_population(){return population_;}
+
+    QColor get_color(){return color_;}
+
+    int get_belongs(){return belongs_;}
+
     void Active_Land(bool p){p?Is_Active_Player1_ = true : Is_Active_Player2_ = true;}
 
     void Occupy(){Is_Occupied_ = true;}
 
     void switch_player(){player_ = !player_;}
+
+    void Set_Land();
+
+    void Set_Color(QColor Color){color_ = Color;update();}
 
     QRectF boundingRect() const override;
 
@@ -35,7 +46,7 @@ public:
 
 signals:
 
-    void Land_Clicked(Land *L);
+    void Land_Clicked(Land *L, bool player);
 
 protected:
 
@@ -55,13 +66,15 @@ private:
 
     int y_;
 
-    const int width_ = 80;
+    const static int width_ = 90;
 
     bool Is_Active_Player1_;
 
     bool Is_Active_Player2_;
 
     static bool player_;
+
+    int belongs_;
 
 };
 
