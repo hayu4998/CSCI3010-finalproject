@@ -32,6 +32,8 @@ public:
 
     void Occupy(){Is_Occupied_ = true;}
 
+    void Unoccupy(){Is_Occupied_ = false; belongs_ = 0;}
+
     void switch_player(){player_ = !player_;}
 
     void Set_Land();
