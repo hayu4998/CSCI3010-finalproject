@@ -7,12 +7,6 @@ Board::Board(){
 
     turn_ = 0;
 
-    P1_ = new Player;
-    P2_ = new Player;
-
-    A1_ = new AI;
-    A2_ = new AI;
-
     player_turn_ = true;
 
     Stored_Land_ = new Land;
@@ -26,6 +20,9 @@ Board::Board(){
 void Board::setBoard(bool p1,bool p2){
     p1_ = p1;
     p2_ = p2;
+
+    P1_ = Player::Player_Factory(p1_);
+    P2_ = Player::Player_Factory(p2_);
 
     qDebug()<<"Start setting board";
     //initial cells
@@ -182,39 +179,19 @@ bool Board::update_resources(Land *L, bool type){
     bool result;
     if(type){
 
-        if(p1_ && p2_){
-
-            result = player_turn_?P1_->Add_Land(L):P2_->Add_Land(L);
-
-        }else if(p1_ || p2_){
-
-            result = player_turn_?P1_->Add_Land(L):A2_->Add_Land(L);
-
-        }else{
-
-            result = player_turn_?A1_->Add_Land(L):A2_->Add_Land(L);
-
-        }
+        result = player_turn_?P1_->Add_Land(L):P2_->Add_Land(L);
 
     }else{
 
         Player * attack;
         Player * Defence;
-        if(p1_ && p2_){
 
-            player_turn_? attack = P1_ : attack = P2_;
-            !player_turn_? Defence = P1_ : Defence = P2_;
-
-        }else if(p1_ || p2_){
-
-            player_turn_? attack = P1_ : attack = A2_;
-            !player_turn_? Defence = P1_ : Defence = A2_;
-
+        if(player_turn_){
+            attack = P1_;
+            attack = P2_;
         }else{
-
-            player_turn_? attack = A1_ : attack = A2_;
-            !player_turn_? Defence = A1_ : Defence = A2_;
-
+            attack = P1_;
+            Defence = P2_;
         }
 
         //updating resource if conqur
@@ -253,91 +230,40 @@ bool Board::update_resources(Land *L, bool type){
 
 QString Board::Update_Player_Data(bool player_turn){
     QString result;
-    if(p1_ && p2_){
 
-        result = player_turn? "Player 1: \n" + P1_->Output_Data():"Player 2: \n"+P2_->Output_Data();
+    result = player_turn? "Player 1: \n" + P1_->Output_Data():"Player 2: \n"+P2_->Output_Data();
 
-    }else if(p1_ || p2_){
-
-        result = player_turn? "Player 1: \n" + P1_->Output_Data():"Player 2: \n"+A2_->Output_Data();
-
-    }else{
-
-        result = player_turn? "Player 1: \n" + A1_->Output_Data():"Player 2: \n"+A2_->Output_Data();
-    }
     return result;
 }
 
 int Board::Get_Player_Soldier_Option(bool player){
     int max_soldier;
-    if(p1_ && p2_){
 
-        max_soldier = player?P1_->Max_Soilder():P2_->Max_Soilder();
+    max_soldier = player?P1_->Max_Soilder():P2_->Max_Soilder();
 
-    }else if(p1_ || p2_){
-
-        max_soldier = player?P1_->Max_Soilder():A2_->Max_Soilder();
-
-    }else{
-
-        max_soldier = player?A1_->Max_Soilder():A2_->Max_Soilder();
-
-    }
     return max_soldier;
 }
 
 void Board::Tranning_Soldiers(int soldiers){
-    if(p1_ && p2_){
 
-        player_turn_?P1_->Transform_Soldier(soldiers):P2_->Transform_Soldier(soldiers);
+    player_turn_?P1_->Transform_Soldier(soldiers):P2_->Transform_Soldier(soldiers);
 
-    }else if(p1_ || p2_){
-
-        player_turn_?P1_->Transform_Soldier(soldiers):A2_->Transform_Soldier(soldiers);
-
-    }else{
-
-        player_turn_?A1_->Transform_Soldier(soldiers):A2_->Transform_Soldier(soldiers);
-
-    }
 }
 
 void Board::Players_Resource_Grow(){
-    if(p1_ && p2_){
 
-        player_turn_?P1_->grow():P2_->grow();
+    player_turn_?P1_->grow():P2_->grow();
 
-    }else if(p1_ || p2_){
-
-        player_turn_?P1_->grow():A2_->grow();
-
-    }else{
-
-        player_turn_?A1_->grow():A2_->grow();
-
-    }
 }
 
 void Board::End_Game(){
 
     Player * P1;
     Player * P2;
-    if(p1_ && p2_){
 
-        P1 = P1_ ;
-        P2 = P2_;
+    P1 = P1_ ;
+    P2 = P2_;
 
-    }else if(p1_ || p2_){
-
-        P1= P1_ ;
-        P2 = A2_;
-
-    }else{
-
-        P1 = A1_;
-        P2 = A2_;
-
-    }
     QMessageBox M;
     if(turn_>12 && turn_<20){
         if(P1->get_gold() <= P2->get_gold()/2){

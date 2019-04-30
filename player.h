@@ -13,6 +13,8 @@ public:
 
     Player();
 
+    static Player* Player_Factory(bool type);
+
     int get_gold(){return gold_;}
 
     int get_solider(){return soldier_;}

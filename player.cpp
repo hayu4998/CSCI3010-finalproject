@@ -18,6 +18,13 @@ Player::Player(){
     iron_mine_ = 0;
 }
 
+Player* Player::Player_Factory(bool type){
+    if(type){
+        return new Player;
+    }else{
+        return new AI;
+    }
+}
 
 void Player::grow(){
 
