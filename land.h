@@ -30,6 +30,8 @@ public:
 
     void Active_Land(bool p){p?Is_Active_Player1_ = true : Is_Active_Player2_ = true;}
 
+    void Deactive_Land(){Is_Active_Player1_ = false; Is_Active_Player2_ = false;}
+
     void Occupy(){Is_Occupied_ = true;}
 
     void Unoccupy(){Is_Occupied_ = false; belongs_ = 0;}
@@ -39,6 +41,8 @@ public:
     void Set_Land();
 
     void Set_Color(QColor Color){color_ = Color;update();}
+
+    void Set_Belongs(bool player){player? belongs_ = 1: belongs_ = 2;}
 
     QRectF boundingRect() const override;
 

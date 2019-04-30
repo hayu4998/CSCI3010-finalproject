@@ -19,6 +19,8 @@ public:
 
     void active_land_near_by(int i, int j);
 
+    void reactive_land_near_by(int i, int j, bool player);
+
     void switch_turn(){player_turn_ = !player_turn_;}
 
     bool update_resources(Land *L, bool type);
@@ -33,6 +35,8 @@ public:
 
     void Players_Resource_Grow();
 
+    void End_Game();
+
 public slots:
 
     void Land_Clicked_Slot(Land *L, bool player);
@@ -42,6 +46,8 @@ public slots:
 signals:
 
     void Update_Player_Data_Signal(QString Output, bool player, int soilders);
+
+    void Game_Over_Signal();
 
 private:
 
@@ -61,6 +67,8 @@ private:
     bool Is_Start_;
 
     Land * Null_Land_;
+
+    int turn_;
 };
 
 #endif // BOARD_H

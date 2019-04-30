@@ -13,13 +13,19 @@ public:
 
     Player();
 
+    int get_gold(){return gold_;}
+
+    int get_solider(){return soldier_;}
+
     int Max_Soilder();
 
     void Transform_Soldier(int soldier);
 
     void grow();
 
-    void Add_Land(Land * L);
+    bool Add_Land(Land * L);
+
+    void Lost_Land(Land *L);
 
     bool Battle_Lost();
 

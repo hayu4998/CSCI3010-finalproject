@@ -5,7 +5,7 @@
 
 Board::Board(){
 
-
+    turn_ = 0;
 
     P1_ = new Player;
     P2_ = new Player;
@@ -59,16 +59,18 @@ void Board::setBoard(bool p1,bool p2){
 
 void Board::taketurn(bool type){
 
-    Players_Resource_Grow();
+
 
     if(update_resources(Stored_Land_,type)){
-
+        Players_Resource_Grow();
         Stored_Land_ ->Set_Land();
         emit Update_Player_Data_Signal(Update_Player_Data(true),true, Get_Player_Soldier_Option(true));
         emit Update_Player_Data_Signal(Update_Player_Data(false),false, Get_Player_Soldier_Option(false));
 
         active_land_near_by(Stored_Land_->get_x(),Stored_Land_->get_y());
-    }else{
+
+    }else if(Stored_Land_->get_belongs() != 0){
+        Players_Resource_Grow();
         QColor C;
         if (!player_turn_){
             C = QColor(255,255,0);
@@ -77,12 +79,22 @@ void Board::taketurn(bool type){
             C = QColor(255,0,255);
             Stored_Land_ -> Set_Color(C);
         }
+
         emit Update_Player_Data_Signal(Update_Player_Data(true),true, Get_Player_Soldier_Option(true));
         emit Update_Player_Data_Signal(Update_Player_Data(false),false, Get_Player_Soldier_Option(false));
 
         switch_turn();
         Stored_Land_->switch_player();
+    }else{
+        Players_Resource_Grow();
+        Stored_Land_ ->Set_Color(QColor(255,255,255));
+        switch_turn();
+        Stored_Land_->switch_player();
     }
+
+    End_Game();
+    std::cout<<"turn: "<<turn_<<std::endl;
+    turn_++;
 
     Stored_Land_ = Null_Land_;
 
@@ -93,12 +105,23 @@ void Board::active_land_near_by(int x, int y){
 
     for(int i = -1; i<2; i++){
         for(int j = -1; j<2; j++){
-            if(x+i>=0 && x+i<8 && y+j>=0 & y+j<8){
+            if(x+i>=0 && x+i<8 && y+j>=0 && y+j<8){
                 Play_board_[x+i][y+j]->Active_Land(player_turn_);
             }
         }
     }
     switch_turn();
+}
+
+void Board::reactive_land_near_by(int x, int y, bool player){
+
+    for(int i = -1; i<2; i++){
+        for(int j = -1; j<2; j++){
+            if(x+i>=0 && x+i<8 && y+j>=0 && y+j<8){
+                Play_board_[x+i][y+j]->Active_Land(player);
+            }
+        }
+    }
 }
 
 void Board::Land_Clicked_Slot(Land *L, bool player){
@@ -143,7 +166,7 @@ void Board::Land_Clicked_Slot(Land *L, bool player){
 
 void Board::Start_Button_Clicked_Slot(bool p1, bool p2){
     if(Is_Start_){
-        setBoard(p1,p2);
+        setBoard(p1,p2);QColor C;
     }else{
         if(Stored_Land_->get_belongs() == 0){
             taketurn(true);
@@ -156,45 +179,76 @@ void Board::Start_Button_Clicked_Slot(bool p1, bool p2){
 
 bool Board::update_resources(Land *L, bool type){
     if(L == Null_Land_){return false;}
+    bool result;
     if(type){
 
         if(p1_ && p2_){
 
-            player_turn_?P1_->Add_Land(L):P2_->Add_Land(L);
+            result = player_turn_?P1_->Add_Land(L):P2_->Add_Land(L);
 
         }else if(p1_ || p2_){
 
-            player_turn_?P1_->Add_Land(L):A2_->Add_Land(L);
+            result = player_turn_?P1_->Add_Land(L):A2_->Add_Land(L);
 
         }else{
 
-            player_turn_?A1_->Add_Land(L):A2_->Add_Land(L);
+            result = player_turn_?A1_->Add_Land(L):A2_->Add_Land(L);
 
         }
 
     }else{
 
-        Player * tmp;
+        Player * attack;
+        Player * Defence;
         if(p1_ && p2_){
 
-            player_turn_? tmp = P1_ : tmp = P2_;
+            player_turn_? attack = P1_ : attack = P2_;
+            !player_turn_? Defence = P1_ : Defence = P2_;
 
         }else if(p1_ || p2_){
-            player_turn_? tmp = P1_ : tmp = A2_;
+
+            player_turn_? attack = P1_ : attack = A2_;
+            !player_turn_? Defence = P1_ : Defence = A2_;
 
         }else{
-            player_turn_? tmp = A1_ : tmp = A2_;
+
+            player_turn_? attack = A1_ : attack = A2_;
+            !player_turn_? Defence = A1_ : Defence = A2_;
 
         }
 
         //updating resource if conqur
-        if(tmp->Battle_Lost()){
+        if(attack->Battle_Lost()){
+            L->Set_Belongs(player_turn_);
+            //reset active cells
+            for(int i = 0 ; i<8 ;i++){
+                for(int j = 0 ; j<8 ;j++){
+
+                    Play_board_[i][j]->Deactive_Land();
+                }
+            }
+
+            for(int i = 0 ; i<8 ;i++){
+
+                for(int j = 0 ; j<8 ;j++){
+
+                    if(Play_board_[i][j]->get_belongs() == 1){
+                        reactive_land_near_by(i,j,true);
+                    }else if(Play_board_[i][j]->get_belongs() == 2){
+                        reactive_land_near_by(i,j,false);
+                    }
+                }
+            }
+
+            Defence->Lost_Land(L);
+
             return update_resources(L,true);
+
         }else{
             return false;
         }
     }
-    return true;
+    return result;
 }
 
 QString Board::Update_Player_Data(bool player_turn){
@@ -263,3 +317,108 @@ void Board::Players_Resource_Grow(){
 
     }
 }
+
+void Board::End_Game(){
+
+    Player * P1;
+    Player * P2;
+    if(p1_ && p2_){
+
+        P1 = P1_ ;
+        P2 = P2_;
+
+    }else if(p1_ || p2_){
+
+        P1= P1_ ;
+        P2 = A2_;
+
+    }else{
+
+        P1 = A1_;
+        P2 = A2_;
+
+    }
+    QMessageBox M;
+    if(turn_>12 && turn_<20){
+        if(P1->get_gold() <= P2->get_gold()/2){
+            M.setText("Game Over");
+            M.setInformativeText("Player 2 win with Economic Overthrow");
+            M.exec();
+            emit Game_Over_Signal();
+        }else if(P2->get_gold() <= P1->get_gold()/2){
+            M.setText("Game Over");
+            M.setInformativeText("Player 1 win with Economic Overthrow");
+            M.exec();
+            emit Game_Over_Signal();
+        }else if(P1->get_solider() < P2->get_solider()/2){
+            M.setText("Game Over");
+            M.setInformativeText("Player 2 win with Military deterrence");
+            M.exec();
+            emit Game_Over_Signal();
+        }else if(P2->get_solider() < P1->get_solider()/2){
+            M.setText("Game Over");
+            M.setInformativeText("Player 1 win with Military deterrence");
+            M.exec();
+            emit Game_Over_Signal();
+        }else{
+            int P1_Land_count = 0;
+            int P2_Land_count = 0;
+            for(int i = 0 ; i<8 ;i++){
+                for(int j = 0 ; j<8 ;j++){
+                    if(Play_board_[i][j]->get_belongs() == 1){
+                        P1_Land_count++;
+                    }else if(Play_board_[i][j]->get_belongs() == 2){
+                        P2_Land_count++;
+                    }
+                }
+            }
+            if(P1_Land_count <= P2_Land_count/2){
+                M.setText("Game Over");
+                M.setInformativeText("Player 2 win with Desperate Potential(2X Land)");
+                M.exec();
+                emit Game_Over_Signal();
+            }else if(P2_Land_count <= P1_Land_count/2){
+                M.setText("Game Over");
+                M.setInformativeText("Player 1 win with Desperate Potential(2X Land)");
+                M.exec();
+                emit Game_Over_Signal();
+            }
+        }
+
+    }else if(turn_ == 20){
+        if(P1->Max_Soilder() < P2->Max_Soilder()){
+            M.setText("Game Over");
+            M.setInformativeText("Player 2 win in the final battle with more soldiers");
+            M.exec();
+        }else if(P1->Max_Soilder() > P2->Max_Soilder()){
+            M.setText("Game Over");
+            M.setInformativeText("Player 1 win in the final battle with more soldiers");
+            M.exec();
+        }else{
+            M.setText("Game Over");
+            M.setInformativeText("Draw");
+            M.exec();
+        }
+        emit Game_Over_Signal();
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

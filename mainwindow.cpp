@@ -32,9 +32,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     player_turn_ = true;
 
+    QString Info_winning = "Winning Criteria: \n After 10 turns: \n\t 1.Twice Gold \n\t 2.Twice Land \n\t 3.Twice Soilder \n After 20 turns: \n\tEvery resource transfer to \n\tSoilders and the one with \n\tmore soilders win";
+    QString Info_cost = "Cost: \n\t-Road: 150 lumber + 10 gold\n\t-Soldier: 20 gold + 5 iron + 1 population\n\t-War: More Soldier lead to higher chance to win.\n\tAttacker lost 10%+1 Soldiers, winner get the land";
+    QString Info_gain = "Gain: \n\t-Forest: +50 lumber each turn\n\t-Gold Mine: +50 gold each turn\n\t-Iron Mine: +20 iron each turn";
     Start_Pop_Up_ = new QMessageBox;
-    Start_Pop_Up_ -> setText("Winning Criteria:");
-    Start_Pop_Up_ -> setInformativeText("After 10 turns: \n\t 1.Twice Gold \n\t 2.Twice Land \n\t 3.Twice Soilder \n After 20 turns: \n\tEvery resource transfer to \n\tSoilders and the one with \n\tmore soilders win");
+    Start_Pop_Up_ -> setText("Game Rules:");
+    Start_Pop_Up_ -> setInformativeText(Info_winning + "\n" + Info_cost + "\n" + Info_gain);
 
     connect(this,&MainWindow::Start_Button_Clicked,Game_Board_,&Board::Start_Button_Clicked_Slot);
     connect(Game_Board_,&Board::Update_Player_Data_Signal, this,&MainWindow::Player_Data_Display_Slot);
@@ -159,4 +162,8 @@ void MainWindow::on_Player2_Train_Soilder_Button_clicked()
     emit Game_Board_->Update_Player_Data_Signal(Game_Board_->Update_Player_Data(false),false, Game_Board_->Get_Player_Soldier_Option(false));
 
     //qDebug()<<ui->Player1_Soilder_Persentage_Bar->value();
+}
+
+void MainWindow::Game_Over_Slot(){
+    ui->Start_Button->setEnabled(false);
 }

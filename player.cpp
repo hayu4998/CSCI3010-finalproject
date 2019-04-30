@@ -24,13 +24,27 @@ void Player::grow(){
     //growing schema
     gold_ += 50*gold_mine_;
     population_ += population_/10;
-    lumber_ += 100 * forest_;
+    lumber_ += 50 * forest_;
     iron_ += 20*iron_mine_;
     player_turn_ = !player_turn_;
 }
 
 
-void Player::Add_Land(Land *L){
+bool Player::Add_Land(Land *L){
+    if(lumber_ < 150){
+        QMessageBox M;
+        M.setText("Fail to Conqur the Land!");
+        M.setInformativeText("Get more lumber to build a road to the land");
+        M.exec();
+        return false;
+    }
+    if(gold_<10){
+        QMessageBox M;
+        M.setText("Fail to Conqur the Land!");
+        M.setInformativeText("Not enough gold to hire labor");
+        M.exec();
+        return false;
+    }
     Resource R = L->get_resource();
     if(R == Resource::Forest){
         forest_++;
@@ -40,6 +54,21 @@ void Player::Add_Land(Land *L){
         iron_mine_++;
     }
     population_+=L->get_population();
+    lumber_ -= 150;
+    gold_ -= 10;
+    return true;
+}
+
+void Player::Lost_Land(Land *L){
+    Resource R = L->get_resource();
+    if(R == Resource::Forest){
+        forest_--;
+    }else if(R == Resource::Gold){
+        gold_mine_--;
+    }else{
+        iron_mine_--;
+    }
+    population_-=L->get_population();
 }
 
 QString Player::Output_Data(){
@@ -83,7 +112,7 @@ bool Player::Battle_Lost(){
         soldier_ -= lost;
         QMessageBox Box;
         Box.setText("You Win the battle!");
-        Box.setInformativeText(("The battle Lost is" + std::to_string(lost) + "Sol").c_str());
+        Box.setInformativeText(("The battle Lost is" + std::to_string(lost) + "Soldiers").c_str());
         Box.exec();
         return true;
     }else{
@@ -91,7 +120,7 @@ bool Player::Battle_Lost(){
         soldier_ -= lost;
         QMessageBox Box;
         Box.setText("You Lost the battle");
-        Box.setInformativeText(("The battle Lost is" + std::to_string(lost)).c_str());
+        Box.setInformativeText(("The battle Lost is" + std::to_string(lost) + "Soldiers").c_str());
         Box.exec();
         return false;
     }

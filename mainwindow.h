@@ -45,6 +45,8 @@ private slots:
 
     void on_Player2_Train_Soilder_Button_clicked();
 
+    void Game_Over_Slot();
+
 signals:
     void Start_Button_Clicked(bool p1,bool p2);
 
