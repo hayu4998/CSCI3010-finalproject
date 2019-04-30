@@ -40,7 +40,6 @@ void Player::Add_Land(Land *L){
         iron_mine_++;
     }
     population_+=L->get_population();
-    grow();
 }
 
 QString Player::Output_Data(){
@@ -53,4 +52,48 @@ QString Player::Output_Data(){
     Output += "Soldier: " + std::to_string(soldier_) + "\n";
 
     return QString(Output.c_str());
+}
+
+int Player::Max_Soilder(){
+    int limit_gold = gold_ / 20;
+    int limit_iron = iron_ / 5;
+    if(limit_gold > limit_iron){
+        return population_>limit_iron? limit_iron:population_ ;
+    }else{
+        return population_>limit_gold? limit_gold:population_ ;
+    }
+}
+
+
+void Player::Transform_Soldier(int soldier){
+    gold_ -= 20*soldier;
+    iron_ -= 5*soldier;
+    population_ -= soldier;
+    soldier_ += soldier;
+}
+
+bool Player::Battle_Lost(){
+
+    if(soldier_ == 0){
+        return false;
+    }
+
+    if(rand()%60 < soldier_){
+        int lost = soldier_/10+1;
+        soldier_ -= lost;
+        QMessageBox Box;
+        Box.setText("You Win the battle!");
+        Box.setInformativeText(("The battle Lost is" + std::to_string(lost) + "Sol").c_str());
+        Box.exec();
+        return true;
+    }else{
+        int lost = soldier_/10+1;
+        soldier_ -= lost;
+        QMessageBox Box;
+        Box.setText("You Lost the battle");
+        Box.setInformativeText(("The battle Lost is" + std::to_string(lost)).c_str());
+        Box.exec();
+        return false;
+    }
+
 }

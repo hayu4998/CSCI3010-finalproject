@@ -21,11 +21,17 @@ public:
 
     void switch_turn(){player_turn_ = !player_turn_;}
 
-    void update_resources(Land *L, bool type);
+    bool update_resources(Land *L, bool type);
 
     Land *Play_board_[8][8];
 
     QString Update_Player_Data(bool player_turn);
+
+    int Get_Player_Soldier_Option(bool player);
+
+    void Tranning_Soldiers(int soldiers);
+
+    void Players_Resource_Grow();
 
 public slots:
 
@@ -35,7 +41,7 @@ public slots:
 
 signals:
 
-    void Update_Player_Data_Signal(QString Output, bool player);
+    void Update_Player_Data_Signal(QString Output, bool player, int soilders);
 
 private:
 

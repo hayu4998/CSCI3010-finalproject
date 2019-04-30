@@ -30,6 +30,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     breaker_ = true;
 
+    player_turn_ = true;
+
     Start_Pop_Up_ = new QMessageBox;
     Start_Pop_Up_ -> setText("Winning Criteria:");
     Start_Pop_Up_ -> setInformativeText("After 10 turns: \n\t 1.Twice Gold \n\t 2.Twice Land \n\t 3.Twice Soilder \n After 20 turns: \n\tEvery resource transfer to \n\tSoilders and the one with \n\tmore soilders win");
@@ -78,8 +80,25 @@ void MainWindow::on_Start_Button_clicked()
 
             }
         }
+        ui->Player2_Train_Soilder_Button->setEnabled(false);
+        ui->Player2_Soilder_Persentage_Bar->setEnabled(false);
         Is_Start_Turn_ = false;
+    }else{
+        player_turn_ = !player_turn_;
+        if(player_turn_){
+            ui->Player2_Train_Soilder_Button->setEnabled(false);
+            ui->Player2_Soilder_Persentage_Bar->setEnabled(false);
+            ui->Player1_Train_Soilder_Button->setEnabled(true);
+            ui->Player1_Soilder_Persentage_Bar->setEnabled(true);
+        }else{
+            ui->Player2_Train_Soilder_Button->setEnabled(true);
+            ui->Player2_Soilder_Persentage_Bar->setEnabled(true);
+            ui->Player1_Train_Soilder_Button->setEnabled(false);
+            ui->Player1_Soilder_Persentage_Bar->setEnabled(false);
+        }
+
     }
+
     breaker_ = true;
 }
 
@@ -101,19 +120,43 @@ void MainWindow::on_Singleplayer_Mode_Button_clicked()
     }
 }
 
-void MainWindow::Player_Data_Display_Slot(QString Output, bool player){
+void MainWindow::Player_Data_Display_Slot(QString Output, bool player, int soldier){
     if(player){
         ui->Player1_Text_Display->setText(Output);
+        ui->Player1_Soilder_Persentage_Bar->setRange(0,soldier);
+        ui->Player1_Soilder_Persentage_Bar->setTickInterval(soldier/10);
+        ui->Player1_Soilder_Persentage_Bar->setTickPosition(QSlider::TicksBelow);
     }else{
         ui->Player2_Text_Display->setText(Output);
+        ui->Player2_Soilder_Persentage_Bar->setRange(0,soldier);
+        ui->Player2_Soilder_Persentage_Bar->setTickInterval(soldier/10);
+        ui->Player2_Soilder_Persentage_Bar->setTickPosition(QSlider::TicksBelow);
     }
+    ui->Player1_Quantity_Indicator_Label->setText("Quantity");
+    ui->Player2_Quantity_Indicator_Label->setText("Quantity");
+    ui->Player1_Soilder_Persentage_Bar->setValue(0);
+    ui->Player2_Soilder_Persentage_Bar->setValue(0);
+}
+
+void MainWindow::on_Player1_Soilder_Persentage_Bar_valueChanged(int value){
+    ui->Player1_Quantity_Indicator_Label->setText(("Quantity: "+std::to_string(value)).c_str());
+}
+
+void MainWindow::on_Player2_Soilder_Persentage_Bar_valueChanged(int value){
+    ui->Player2_Quantity_Indicator_Label->setText(("Quantity: "+std::to_string(value)).c_str());
+}
+
+void MainWindow::on_Player1_Train_Soilder_Button_clicked()
+{
+    Game_Board_->Tranning_Soldiers(ui->Player1_Soilder_Persentage_Bar->value());
+    emit Game_Board_->Update_Player_Data_Signal(Game_Board_->Update_Player_Data(true),true, Game_Board_->Get_Player_Soldier_Option(true));
 }
 
 
+void MainWindow::on_Player2_Train_Soilder_Button_clicked()
+{
+    Game_Board_->Tranning_Soldiers( ui->Player2_Soilder_Persentage_Bar->value());
+    emit Game_Board_->Update_Player_Data_Signal(Game_Board_->Update_Player_Data(false),false, Game_Board_->Get_Player_Soldier_Option(false));
 
-
-
-
-
-
-
+    //qDebug()<<ui->Player1_Soilder_Persentage_Bar->value();
+}

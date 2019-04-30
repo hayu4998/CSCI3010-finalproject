@@ -53,20 +53,40 @@ void Board::setBoard(bool p1,bool p2){
     active_land_near_by(7,0);
 
     //setting Player data display
-    emit Update_Player_Data_Signal(Update_Player_Data(true),true);
-    emit Update_Player_Data_Signal(Update_Player_Data(false),false);
+    emit Update_Player_Data_Signal(Update_Player_Data(true),true,Get_Player_Soldier_Option(true));
+    emit Update_Player_Data_Signal(Update_Player_Data(false),false, Get_Player_Soldier_Option(false));
 }
 
 void Board::taketurn(bool type){
 
-    active_land_near_by(Stored_Land_->get_x(),Stored_Land_->get_y());
-    Stored_Land_ ->Set_Land();
-    update_resources(Stored_Land_,type);
+    Players_Resource_Grow();
 
-    emit Update_Player_Data_Signal(Update_Player_Data(true),true);
-    emit Update_Player_Data_Signal(Update_Player_Data(false),false);
+    if(update_resources(Stored_Land_,type)){
+
+        Stored_Land_ ->Set_Land();
+        emit Update_Player_Data_Signal(Update_Player_Data(true),true, Get_Player_Soldier_Option(true));
+        emit Update_Player_Data_Signal(Update_Player_Data(false),false, Get_Player_Soldier_Option(false));
+
+        active_land_near_by(Stored_Land_->get_x(),Stored_Land_->get_y());
+    }else{
+        QColor C;
+        if (!player_turn_){
+            C = QColor(255,255,0);
+            Stored_Land_ -> Set_Color(C);
+        }else{
+            C = QColor(255,0,255);
+            Stored_Land_ -> Set_Color(C);
+        }
+        emit Update_Player_Data_Signal(Update_Player_Data(true),true, Get_Player_Soldier_Option(true));
+        emit Update_Player_Data_Signal(Update_Player_Data(false),false, Get_Player_Soldier_Option(false));
+
+        switch_turn();
+        Stored_Land_->switch_player();
+    }
 
     Stored_Land_ = Null_Land_;
+
+
 }
 
 void Board::active_land_near_by(int x, int y){
@@ -78,9 +98,7 @@ void Board::active_land_near_by(int x, int y){
             }
         }
     }
-
     switch_turn();
-
 }
 
 void Board::Land_Clicked_Slot(Land *L, bool player){
@@ -136,8 +154,8 @@ void Board::Start_Button_Clicked_Slot(bool p1, bool p2){
     }
 }
 
-void Board::update_resources(Land *L, bool type){
-
+bool Board::update_resources(Land *L, bool type){
+    if(L == Null_Land_){return false;}
     if(type){
 
         if(p1_ && p2_){
@@ -159,7 +177,7 @@ void Board::update_resources(Land *L, bool type){
         Player * tmp;
         if(p1_ && p2_){
 
-            player_turn_?tmp = P1_ : tmp = P2_;
+            player_turn_? tmp = P1_ : tmp = P2_;
 
         }else if(p1_ || p2_){
             player_turn_? tmp = P1_ : tmp = A2_;
@@ -171,10 +189,12 @@ void Board::update_resources(Land *L, bool type){
 
         //updating resource if conqur
         if(tmp->Battle_Lost()){
-            update_resources(L,true);
+            return update_resources(L,true);
+        }else{
+            return false;
         }
     }
-
+    return true;
 }
 
 QString Board::Update_Player_Data(bool player_turn){
@@ -192,4 +212,54 @@ QString Board::Update_Player_Data(bool player_turn){
         result = player_turn? "Player 1: \n" + A1_->Output_Data():"Player 2: \n"+A2_->Output_Data();
     }
     return result;
+}
+
+int Board::Get_Player_Soldier_Option(bool player){
+    int max_soldier;
+    if(p1_ && p2_){
+
+        max_soldier = player?P1_->Max_Soilder():P2_->Max_Soilder();
+
+    }else if(p1_ || p2_){
+
+        max_soldier = player?P1_->Max_Soilder():A2_->Max_Soilder();
+
+    }else{
+
+        max_soldier = player?A1_->Max_Soilder():A2_->Max_Soilder();
+
+    }
+    return max_soldier;
+}
+
+void Board::Tranning_Soldiers(int soldiers){
+    if(p1_ && p2_){
+
+        player_turn_?P1_->Transform_Soldier(soldiers):P2_->Transform_Soldier(soldiers);
+
+    }else if(p1_ || p2_){
+
+        player_turn_?P1_->Transform_Soldier(soldiers):A2_->Transform_Soldier(soldiers);
+
+    }else{
+
+        player_turn_?A1_->Transform_Soldier(soldiers):A2_->Transform_Soldier(soldiers);
+
+    }
+}
+
+void Board::Players_Resource_Grow(){
+    if(p1_ && p2_){
+
+        player_turn_?P1_->grow():P2_->grow();
+
+    }else if(p1_ || p2_){
+
+        player_turn_?P1_->grow():A2_->grow();
+
+    }else{
+
+        player_turn_?A1_->grow():A2_->grow();
+
+    }
 }

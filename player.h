@@ -5,6 +5,7 @@
 #include <QColor>
 #include "land.h"
 #include <vector>
+#include <QMessageBox>
 
 class Player:public QObject{
     Q_OBJECT
@@ -12,13 +13,15 @@ public:
 
     Player();
 
-    void transform_soilder(float gold);
+    int Max_Soilder();
+
+    void Transform_Soldier(int soldier);
 
     void grow();
 
     void Add_Land(Land * L);
 
-    bool Battle_Lost(){return true;}
+    bool Battle_Lost();
 
     void Conquering_Land();
 
