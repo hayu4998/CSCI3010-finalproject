@@ -47,6 +47,10 @@ private slots:
 
     void Game_Over_Slot();
 
+    void on_Reset_Button_clicked();
+
+    void Turn_Update_Slot(int Turn);
+
 signals:
     void Start_Button_Clicked(bool p1,bool p2);
 

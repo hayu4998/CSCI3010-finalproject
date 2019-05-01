@@ -20,7 +20,7 @@ Land::Land(bool start, int x, int y){
     if(start){
         resource_ = Resource::Forest;
         Is_Occupied_ = true;
-        population_ = 50;
+        population_ = 20;
         if(y_ == 7) {
             Is_Active_Player1_ = true;
             belongs_ = 1;
@@ -42,7 +42,7 @@ Land::Land(bool start, int x, int y){
             resource_ = Resource::Forest;
         }
         Is_Occupied_ = false;
-        population_ = rand() % 50 +1;
+        population_ = rand() % 25 +1;
         QColor C(255,255,255);
         color_ = C;
         belongs_ = 0;

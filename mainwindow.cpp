@@ -41,6 +41,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(this,&MainWindow::Start_Button_Clicked,Game_Board_,&Board::Start_Button_Clicked_Slot);
     connect(Game_Board_,&Board::Update_Player_Data_Signal, this,&MainWindow::Player_Data_Display_Slot);
+    connect(Game_Board_,&Board::Game_Over_Signal,this, &MainWindow::Game_Over_Slot);
+    connect(Game_Board_,&Board::Turn_Update_Signal, this, &MainWindow::Turn_Update_Slot);
 }
 
 MainWindow::~MainWindow()
@@ -165,5 +167,30 @@ void MainWindow::on_Player2_Train_Soilder_Button_clicked()
 }
 
 void MainWindow::Game_Over_Slot(){
+    qDebug()<<"EndGame Received";
     ui->Start_Button->setEnabled(false);
+}
+
+void MainWindow::on_Reset_Button_clicked()
+{
+    QGraphicsView * view = ui->graphicsView;
+
+    scene = new QGraphicsScene;
+
+    view->setScene(scene);
+
+    ui->Player1_Text_Display->setText("");
+    ui->Player2_Text_Display->setText("");
+
+    ui->Start_Button->setEnabled(true);
+
+}
+
+void MainWindow::Turn_Update_Slot(int Turn){
+    QString S = ("Turn: " +std::to_string(Turn)).c_str();
+    if(Turn == 9){
+        S = S + "\n BEWARE: Sudden Death start in next turn! Train your soldiers!";
+    }
+    ui->Turn_Indicator_Label->setText(S);
+
 }

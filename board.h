@@ -1,6 +1,7 @@
 #ifndef BOARD_H
 #define BOARD_H
 #include <QWidget>
+#include <iostream>
 //#include <QColor>
 //#include <QGraphicsItem>
 
@@ -21,7 +22,7 @@ public:
 
     void reactive_land_near_by(int i, int j, bool player);
 
-    void switch_turn(){player_turn_ = !player_turn_;}
+    void switch_turn(){player_turn_ = !player_turn_;std::cout<<"Switch turn"<<std::endl;}
 
     bool update_resources(Land *L, bool type);
 
@@ -49,13 +50,12 @@ signals:
 
     void Game_Over_Signal();
 
+    void Turn_Update_Signal(int turn);
+
 private:
 
     Player *P1_;
     Player *P2_;
-
-    AI *A1_;
-    AI *A2_;
 
     bool p1_;
     bool p2_;

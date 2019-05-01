@@ -68,7 +68,7 @@ class AI: public Player{
 public:
     AI():Player(){}
 
-    void take_turn();
+    void Choose();
 
     int target_;
 };

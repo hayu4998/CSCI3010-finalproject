@@ -92,10 +92,8 @@ void Board::taketurn(bool type){
     End_Game();
     std::cout<<"turn: "<<turn_<<std::endl;
     turn_++;
-
+    Turn_Update_Signal(turn_);
     Stored_Land_ = Null_Land_;
-
-
 }
 
 void Board::active_land_near_by(int x, int y){

@@ -9,7 +9,7 @@ Player::Player(){
 
     //initalize starting conditions;
     gold_ = 200;
-    population_ = 50;
+    population_ = 20;
     lumber_ = 200;
     soldier_ = 0;
     iron_ = 50;

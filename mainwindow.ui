@@ -192,18 +192,18 @@
      <string>Start</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="Turn_Indicator_Label">
     <property name="geometry">
      <rect>
       <x>860</x>
       <y>520</y>
-      <width>111</width>
-      <height>31</height>
+      <width>281</width>
+      <height>51</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <pointsize>12</pointsize>
+      <pointsize>9</pointsize>
       <weight>75</weight>
       <bold>true</bold>
      </font>
@@ -212,7 +212,7 @@
      <string>Turn:</string>
     </property>
     <property name="alignment">
-     <set>Qt::AlignCenter</set>
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
     </property>
    </widget>
   </widget>
