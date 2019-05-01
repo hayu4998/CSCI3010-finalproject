@@ -53,6 +53,8 @@ public:
 
     Land* optimal_Choice(Land *Array[8][8], Resource Target);
 
+    static void Set_player_turn(bool player_turn){player_turn_ = player_turn;}
+
 signals:
 
     void take_turn(Land * target);

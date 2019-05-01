@@ -20,6 +20,8 @@ public:
 
     int get_y(){return y_;}
 
+    bool get_player_turn(){return player_;}
+
     Resource get_resource(){return resource_;}
 
     int get_population(){return population_;}
@@ -40,13 +42,15 @@ public:
 
     void Unoccupy(){Is_Occupied_ = false; belongs_ = 0;}
 
-    void switch_player(){player_ = !player_;}
+    static void switch_player(){player_ = !player_;}
 
     void Set_Land();
 
     void Set_Color(QColor Color){color_ = Color;update();}
 
     void Set_Belongs(bool player){player? belongs_ = 1: belongs_ = 2;}
+
+    static void Set_player_turn(bool player){player_ = player;}
 
     QRectF boundingRect() const override;
 

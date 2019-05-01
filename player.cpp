@@ -33,7 +33,6 @@ void Player::grow(){
     population_ += population_/10;
     lumber_ += 50 * forest_;
     iron_ += 20*iron_mine_;
-    player_turn_ = !player_turn_;
     turn_++;
 }
 
@@ -179,13 +178,13 @@ Land* Player::optimal_Choice(Land *Game_Board[8][8], Resource Target){
             }
         }
     }
-    //qDebug()<<"Break Here";
+    //qDebug()<<"After searching";
     if(!indicator && Target == Resource::Forest){
         Choice = optimal_Choice(Game_Board,Resource::Gold);
     }else if(!indicator && Target == Resource::Gold){
         Choice = optimal_Choice(Game_Board,Resource::Iron);
     }else if(!indicator && Target == Resource::Iron){
-        Choice = optimal_Choice(Game_Board,Resource::Iron);
+        Choice = optimal_Choice(Game_Board,Resource::Forest);
     }
     return Choice;
 }

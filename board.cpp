@@ -53,11 +53,17 @@ void Board::setBoard(bool p1,bool p2){
     //qDebug()<<"Start setting avaliable slots";
 
     //active aviable squares
-    player_turn_ = true;
-    Is_Start_ = false;
+
 
     active_land_near_by(0,7);
+    player_turn_ = false;
     active_land_near_by(7,0);
+    player_turn_ = true;
+
+    Land::Set_player_turn(player_turn_);
+    Player::Set_player_turn(player_turn_);
+
+    Is_Start_ = false;
 
     //setting Player data display
     emit Update_Player_Data_Signal(Update_Player_Data(true),true,Get_Player_Soldier_Option(true));
@@ -73,6 +79,7 @@ void Board::taketurn(bool type){
         emit Update_Player_Data_Signal(Update_Player_Data(false),false, Get_Player_Soldier_Option(false));
 
         active_land_near_by(Stored_Land_->get_x(),Stored_Land_->get_y());
+        switch_turn();
 
     }else if(Stored_Land_->get_belongs() != 0){
         Players_Resource_Grow();
@@ -89,12 +96,12 @@ void Board::taketurn(bool type){
         emit Update_Player_Data_Signal(Update_Player_Data(false),false, Get_Player_Soldier_Option(false));
 
         switch_turn();
-        Stored_Land_->switch_player();
+
     }else{
+
         Players_Resource_Grow();
         Stored_Land_ ->Set_Color(QColor(255,255,255));
         switch_turn();
-        Stored_Land_->switch_player();
     }
 
     End_Game();
@@ -102,6 +109,11 @@ void Board::taketurn(bool type){
     turn_++;
 
     Turn_Update_Signal(turn_);
+    P1_->Set_player_turn(player_turn_);
+    Stored_Land_->Set_player_turn(player_turn_);
+    qDebug()<<"Board class turn:"<<player_turn_;
+    qDebug()<<"Player class turn:"<<P1_->get_player_turn();
+    qDebug()<<"Land class turn:"<<Stored_Land_->get_player_turn();
 
     Stored_Land_ = Null_Land_;
 
@@ -115,7 +127,7 @@ void Board::taketurn(bool type){
 }
 
 void Board::active_land_near_by(int x, int y){
-
+    qDebug()<<"Active:("<<x<<","<<y<<")";
     for(int i = -1; i<2; i++){
         for(int j = -1; j<2; j++){
             if(x+i>=0 && x+i<8 && y+j>=0 && y+j<8){
@@ -123,7 +135,6 @@ void Board::active_land_near_by(int x, int y){
             }
         }
     }
-    switch_turn();
 }
 
 void Board::reactive_land_near_by(int x, int y, bool player){
@@ -181,7 +192,7 @@ void Board::Start_Button_Clicked_Slot(bool p1, bool p2){
     if(Is_Start_){
         setBoard(p1,p2);QColor C;
     }else{
-        if(Stored_Land_->get_belongs() == 0){
+        if(Stored_Land_->get_belongs() == 0 && Stored_Land_ != Null_Land_){
             taketurn(true);
         }else{
             //qDebug()<<"Conducting War";

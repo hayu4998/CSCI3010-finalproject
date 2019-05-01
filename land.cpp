@@ -97,7 +97,7 @@ void Land::mousePressEvent(QGraphicsSceneMouseEvent *event){
     QGraphicsItem::mousePressEvent(event);
     //conqur empty land
     if(!Is_Occupied_ && ((Is_Active_Player1_ && player_) || (Is_Active_Player2_ && !player_))){
-        //Is_Occupied_ = true;
+        qDebug()<<"Press Signal Received";
 
         if(player_ && Is_Active_Player1_){
             emit Land_Clicked(this, player_);
@@ -124,13 +124,11 @@ void Land::Set_Land(){
         C = QColor(255,255,0);
         color_ = C;
         belongs_ = 1;
-        switch_player();
     }else{
         QColor C;
         C = QColor(255,0,255);
         color_ = C;
         belongs_ = 2;
-        switch_player();
     }
     Is_Occupied_ = true;
     update();
