@@ -34,7 +34,7 @@ public:
 
     void Players_Resource_Grow();
 
-    void End_Game();
+    int End_Game();
 
     void AI_Start_Game();
 
@@ -54,7 +54,7 @@ signals:
 
     void Update_Player_Data_Signal(QString Output, bool player, int soilders);
 
-    void Game_Over_Signal(bool winner);
+    void Game_Over_Signal(int result);
 
     void Turn_Update_Signal(int turn);
 

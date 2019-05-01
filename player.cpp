@@ -52,18 +52,42 @@ bool Player::Add_Land(Land *L){
         M.exec();
         return false;
     }
-    Resource R = L->get_resource();
-    if(R == Resource::Forest){
-        forest_++;
-    }else if(R == Resource::Gold){
-        gold_mine_++;
-    }else{
-        iron_mine_++;
-    }
+    increment_resource(L->get_resource());
+
     population_+=L->get_population();
     lumber_ -= 150;
     gold_ -= 10;
     return true;
+}
+bool AI::Add_Land(Land *L){
+    if( get_lumber() < 150){
+        return false;
+    }
+    if(get_gold()<10){
+        return false;
+    }
+    increment_resource(L->get_resource());
+
+    //population_+=L->get_population();
+    Change_Resource("population",L->get_population());
+    //lumber_ -= 150;
+    Change_Resource("lumber",-150);
+    //gold_ -= 10;
+    Change_Resource("gold",-10);
+    return true;
+}
+
+void Player::Change_Resource(std::string s, int quantity){
+    if(s == "population"){population_ += quantity;}
+    if(s == "lumber"){lumber_ += quantity;}
+    if(s == "gold"){gold_ += quantity;}
+    if(s == "soldier"){soldier_ += quantity;}
+}
+
+void Player::increment_resource(Resource R){
+    if(R == Resource::Forest){forest_++;}
+    if(R == Resource::Gold){gold_mine_++;}
+    if(R == Resource::Iron){forest_++;}
 }
 
 void Player::Lost_Land(Land *L){
@@ -117,26 +141,42 @@ bool Player::Battle_Lost(){
         return false;
     }
 
+    int lost = soldier_/10+1;
+    soldier_ -= lost;
+
     if(rand()%60 < soldier_){
-        int lost = soldier_/10+1;
-        soldier_ -= lost;
 
         Box.setText("You Win the battle!");
         Box.setInformativeText(("The battle Lost is" + std::to_string(lost) + "Soldiers").c_str());
         Box.exec();
         return true;
+
     }else{
-        int lost = soldier_/10+1;
-        soldier_ -= lost;
 
         Box.setText("You Lost the battle");
         Box.setInformativeText(("The battle Lost is" + std::to_string(lost) + "Soldiers").c_str());
         Box.exec();
         return false;
+
     }
 
 }
 
+bool AI::Battle_Lost(){
+    QMessageBox Box;
+    if(get_solider() == 0){
+        return false;
+    }
+
+    int lost = get_solider()/10+1;
+    Change_Resource("soldier",-lost);
+    if(rand()%60 < get_solider()){
+        return true;
+    }else{
+        return false;
+    }
+
+}
 void Player::Choose(Land * Game_Board[8][8]){
 
     Resource Target;
@@ -198,3 +238,4 @@ int AI::Max_Soilder(){
         return get_population()>limit_gold? limit_gold:get_population() ;
     }
 }
+

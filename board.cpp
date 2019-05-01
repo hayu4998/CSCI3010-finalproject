@@ -104,26 +104,30 @@ void Board::taketurn(bool type){
         switch_turn();
     }
 
-    End_Game();
+    int result = End_Game();
     std::cout<<"turn: "<<turn_<<std::endl;
     turn_++;
 
     Turn_Update_Signal(turn_);
     P1_->Set_player_turn(player_turn_);
     Stored_Land_->Set_player_turn(player_turn_);
-    qDebug()<<"Board class turn:"<<player_turn_;
-    qDebug()<<"Player class turn:"<<P1_->get_player_turn();
-    qDebug()<<"Land class turn:"<<Stored_Land_->get_player_turn();
+    //qDebug()<<"Board class turn:"<<player_turn_;
+    //qDebug()<<"Player class turn:"<<P1_->get_player_turn();
+    //qDebug()<<"Land class turn:"<<Stored_Land_->get_player_turn();
 
     Stored_Land_ = Null_Land_;
+    if(!p1_ && !p2_ && result == 0){
+        if(player_turn_ && !p1_){
 
-    if(player_turn_ && !p1_){
-
-        P1_->Choose(Play_board_);
-    }else if(!player_turn_ && !p2_){
-        qDebug()<<"AI_Choose_called";
-        P2_->Choose(Play_board_);
+            P1_->Choose(Play_board_);
+        }else if(!player_turn_ && !p2_){
+            //qDebug()<<"AI_Choose_called";
+            P2_->Choose(Play_board_);
+        }
+    }else if(result !=0){
+        emit Game_Over_Signal(result);
     }
+
 }
 
 void Board::active_land_near_by(int x, int y){
@@ -284,7 +288,7 @@ void Board::Players_Resource_Grow(){
 
 }
 
-void Board::End_Game(){
+int Board::End_Game(){
 
     Player * P1;
     Player * P2;
@@ -293,29 +297,34 @@ void Board::End_Game(){
     P2 = P2_;
 
     QMessageBox M;
+    int result = 0;
 
     //winning criterias
-    if(turn_>12 && turn_<20){
+    if(turn_>11 && turn_<20){
         if(P1->get_solider() < P2->get_solider()/2 ){
             M.setText("Game Over");
             M.setInformativeText("Player 2 win with Military deterrence");
             M.exec();
-            emit Game_Over_Signal(false);
+            result = 2;
+
         }else if(P2->get_solider() < P1->get_solider()/2){
             M.setText("Game Over");
             M.setInformativeText("Player 1 win with Military deterrence");
             M.exec();
-            emit Game_Over_Signal(true);
+            result = 1;
+
         }else if(P1->get_gold() <= P2->get_gold()/2){
             M.setText("Game Over");
             M.setInformativeText("Player 2 win with Economic Overthrow");
             M.exec();
-            emit Game_Over_Signal(false);
+            result = 2;
+
         }else if(P2->get_gold() <= P1->get_gold()/2){
             M.setText("Game Over");
             M.setInformativeText("Player 1 win with Economic Overthrow");
             M.exec();
-            emit Game_Over_Signal(true);
+            result = 1;
+
         }else{
             int P1_Land_count = 0;
             int P2_Land_count = 0;
@@ -332,12 +341,14 @@ void Board::End_Game(){
                 M.setText("Game Over");
                 M.setInformativeText("Player 2 win with Desperate Potential(2X Land)");
                 M.exec();
-                emit Game_Over_Signal(false);
+                result = 2;
+
             }else if(P2_Land_count <= P1_Land_count/2){
                 M.setText("Game Over");
                 M.setInformativeText("Player 1 win with Desperate Potential(2X Land)");
                 M.exec();
-                emit Game_Over_Signal(true);
+                result = 1;
+
             }
         }
 
@@ -346,20 +357,24 @@ void Board::End_Game(){
             M.setText("Game Over");
             M.setInformativeText("Player 2 win in the final battle with more soldiers");
             M.exec();
-            emit Game_Over_Signal(false);
+            result = 2;
+
         }else if(P1->Max_Soilder() > P2->Max_Soilder()){
             M.setText("Game Over");
             M.setInformativeText("Player 1 win in the final battle with more soldiers");
             M.exec();
-            emit Game_Over_Signal(true);
+            result = 1;
+
         }else{
             M.setText("Game Over");
             M.setInformativeText("Draw");
             M.exec();
-            emit Game_Over_Signal(false);
+            result = 3;
+
         }
 
     }
+    return result;
 }
 
 void Board::AI_Choice_Slot(Land* L){

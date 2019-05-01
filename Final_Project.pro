@@ -29,13 +29,15 @@ SOURCES += \
         mainwindow.cpp \
         board.cpp \
         land.cpp \
-        player.cpp
+        player.cpp \
+    aiscoredisplay.cpp
 
 HEADERS += \
         mainwindow.h \
         board.h \
         land.h \
-        player.h
+        player.h \
+    aiscoredisplay.h
 
 FORMS += \
         mainwindow.ui

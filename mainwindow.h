@@ -7,7 +7,7 @@
 #include <QGraphicsView>
 #include <QMessageBox>
 #include "board.h"
-
+#include "aiscoredisplay.h"
 
 namespace Ui {
 class MainWindow;
@@ -46,7 +46,7 @@ private slots:
 
     void on_Player2_Train_Soilder_Button_clicked();
 
-    void Game_Over_Slot(bool winner);
+    void Game_Over_Slot(int result);
 
     void on_Reset_Button_clicked();
 
@@ -63,6 +63,8 @@ private:
     Ui::MainWindow *ui;
 
     QGraphicsScene * scene;
+
+    QGraphicsScene * AI_scene;
 
     bool Is_Start_Turn_;
 
@@ -81,6 +83,11 @@ private:
     int Player1_win_count;
 
     int Player2_win_count;
+
+    AIScoreDisplay *Player1_Score_display_;
+
+    AIScoreDisplay *Player2_Score_display_;
+
 };
 
 #endif // MAINWINDOW_H

@@ -25,11 +25,11 @@ public:
 
     void grow();
 
-    bool Add_Land(Land * L);
+    virtual bool Add_Land(Land * L);
 
     void Lost_Land(Land *L);
 
-    bool Battle_Lost();
+    virtual bool Battle_Lost();
 
     void Conquering_Land();
 
@@ -44,6 +44,12 @@ public:
     int get_iron(){return iron_;}
 
     int get_population(){return population_;}
+
+    int get_lumber(){return lumber_;}
+
+    void increment_resource(Resource R);
+
+    void Change_Resource(std::string s, int quantity);
 
     static int get_turn(){return turn_;}
 
@@ -91,6 +97,10 @@ public:
     AI():Player(){}
 
     int Max_Soilder() override;
+
+    bool Add_Land(Land * L) override;
+
+    bool Battle_Lost() override;
 };
 
 #endif // PLAYER_H

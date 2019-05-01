@@ -20,6 +20,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     view->setScene(scene);
 
+    QGraphicsView * AI_view = ui->AI_Simulation_Graphic_View;
+
+    AI_scene = new QGraphicsScene;
+
+    AI_view->setScene(AI_scene);
+
     Board* game = new Board;
 
     Game_Board_ = game;
@@ -32,6 +38,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     player_turn_ = true;
 
+    ui->Simulate_Slide_Bar->setTickInterval(5);
+    ui->Simulate_Slide_Bar->setMaximum(50);
+    ui->Simulate_Slide_Bar->setMinimum(1);
     QString Info_winning = "Winning Criteria: \n After 10 turns: \n\t 1.Twice Gold \n\t 2.Twice Land \n\t 3.Twice Soilder \n After 20 turns: \n\tEvery resource transfer to \n\tSoilders and the one with \n\tmore soilders win";
     QString Info_cost = "Cost: \n\t-Road: 150 lumber + 10 gold\n\t-Soldier: 20 gold + 5 iron + 1 population\n\t-War: More Soldier lead to higher chance to win.\n\tAttacker lost 10%+1 Soldiers, winner get the land";
     QString Info_gain = "Gain: \n\t-Forest: +50 lumber each turn\n\t-Gold Mine: +50 gold each turn\n\t-Iron Mine: +20 iron each turn";
@@ -89,6 +98,7 @@ void MainWindow::on_Start_Button_clicked()
         ui->Player2_Soilder_Persentage_Bar->setEnabled(false);
         Is_Start_Turn_ = false;
         if(Game_Mode_ == 3){
+
             Game_Board_->AI_Start_Game();
         }
     }else{
@@ -169,12 +179,25 @@ void MainWindow::on_Player2_Train_Soilder_Button_clicked()
     //qDebug()<<ui->Player1_Soilder_Persentage_Bar->value();
 }
 
-void MainWindow::Game_Over_Slot(bool winner){
+void MainWindow::Game_Over_Slot(int result){
     qDebug()<<"EndGame Received";
     if(Game_Mode_ == 3){
-        winner?Player1_win_count++:Player2_win_count++;
-        Simulations_Left_--;
-        AI_Turn_Iterator();
+        if(result == 1){
+            Player1_win_count++;
+        }else if(result == 2){
+            Player2_win_count++;
+        }else{
+            Player1_win_count++;
+            Player2_win_count++;
+        }
+
+        AI_scene->update();
+
+        if(Simulations_Left_ != 0){
+            AI_Turn_Iterator();
+        }
+
+
     }else{
         ui->Start_Button->setEnabled(false);
     }
@@ -190,6 +213,8 @@ void MainWindow::on_Reset_Button_clicked()
     scene = new QGraphicsScene;
 
     view->setScene(scene);
+
+
 
     ui->Player1_Text_Display->setText("");
     ui->Player2_Text_Display->setText("");
@@ -211,6 +236,10 @@ void MainWindow::on_Reset_Button_clicked()
 
     ui->Singleplayer_Mode_Button->setText("Singleplayer");
     ui->Multiplayer_Mode_Button->setText("Multiplayer");
+
+    ui->Simulate_Slide_Bar->setTickInterval(5);
+    ui->Simulate_Slide_Bar->setMaximum(50);
+    ui->Simulate_Slide_Bar->setMinimum(1);
 
     connect(this,&MainWindow::Start_Button_Clicked,Game_Board_,&Board::Start_Button_Clicked_Slot);
     connect(Game_Board_,&Board::Update_Player_Data_Signal, this,&MainWindow::Player_Data_Display_Slot);
@@ -240,17 +269,19 @@ void MainWindow::on_Simulation_Start_Button_clicked()
     Simulations_Left_ = ui->Simulate_Slide_Bar->value();
     Player1_win_count = 0;
     Player2_win_count = 0;
+    //update Winning graph
+    Player1_Score_display_ = new AIScoreDisplay(10,Player1_win_count,1);
+    Player2_Score_display_ = new AIScoreDisplay(-10,Player2_win_count,2);
+    AI_scene->addItem(Player1_Score_display_);
+    AI_scene->addItem(Player2_Score_display_);
     AI_Turn_Iterator();
 }
 
 void MainWindow::AI_Turn_Iterator(){
-    if(Simulations_Left_ == 0){
-        return;
-    }
 
-    Simulations_Left_ --;
+    Simulations_Left_--;
     on_Reset_Button_clicked();
-    qDebug()<<"Reset Successful";
+    qDebug()<<"Reset Successful, turn:"<<Simulations_Left_;
     Game_Mode_ = 3;
     on_Start_Button_clicked();
 }
