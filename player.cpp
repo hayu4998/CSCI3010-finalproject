@@ -1,5 +1,5 @@
 #include "player.h"
-
+#include <QDebug>
 //tract player turn
 bool Player::player_turn_ = true;
 // keep tract of number of turn
@@ -34,6 +34,7 @@ void Player::grow(){
     lumber_ += 50 * forest_;
     iron_ += 20*iron_mine_;
     player_turn_ = !player_turn_;
+    turn_++;
 }
 
 
@@ -109,15 +110,18 @@ void Player::Transform_Soldier(int soldier){
 }
 
 bool Player::Battle_Lost(){
-
+    QMessageBox Box;
     if(soldier_ == 0){
+        Box.setText("You Lost the battle!");
+        Box.setInformativeText("You don't have any soldier");
+        Box.exec();
         return false;
     }
 
     if(rand()%60 < soldier_){
         int lost = soldier_/10+1;
         soldier_ -= lost;
-        QMessageBox Box;
+
         Box.setText("You Win the battle!");
         Box.setInformativeText(("The battle Lost is" + std::to_string(lost) + "Soldiers").c_str());
         Box.exec();
@@ -125,11 +129,73 @@ bool Player::Battle_Lost(){
     }else{
         int lost = soldier_/10+1;
         soldier_ -= lost;
-        QMessageBox Box;
+
         Box.setText("You Lost the battle");
         Box.setInformativeText(("The battle Lost is" + std::to_string(lost) + "Soldiers").c_str());
         Box.exec();
         return false;
     }
 
+}
+
+void Player::Choose(Land * Game_Board[8][8]){
+
+    Resource Target;
+    if(get_forest()<3){
+        Target = Resource::Forest;
+    }else if (get_gold_mine()<=get_iron_mine()/2 || gold_mine_ <= 2) {
+        Target = Resource::Gold;
+    }else{
+        Target = Resource::Iron;
+    }
+
+    Land * choice = optimal_Choice(Game_Board,Target);
+
+    if(get_turn() == 9 || get_turn() == 10){
+        Transform_Soldier(Max_Soilder());
+    }
+
+    emit take_turn(choice);
+}
+
+Land* Player::optimal_Choice(Land *Game_Board[8][8], Resource Target){
+
+    Land* Choice = new Land;
+    bool indicator = false;
+    for(int i = 0; i<8; i++){
+        for(int j = 0; j<8; j++){
+            if(Game_Board[i][j]->get_Is_Active_Player1() && get_player_turn()){
+                if(Target == Game_Board[i][j]->get_resource() && Game_Board[i][j]->get_belongs() == 0){
+                    Choice = Game_Board[i][j];
+                    indicator = true;
+                    break;
+                }
+            }else if(Game_Board[i][j]->get_Is_Active_Player2() && !get_player_turn()){
+                if(Target == Game_Board[i][j]->get_resource() && Game_Board[i][j]->get_belongs() == 0){
+                    Choice = Game_Board[i][j];
+                    indicator = true;
+                    break;
+                }
+            }
+        }
+    }
+    //qDebug()<<"Break Here";
+    if(!indicator && Target == Resource::Forest){
+        Choice = optimal_Choice(Game_Board,Resource::Gold);
+    }else if(!indicator && Target == Resource::Gold){
+        Choice = optimal_Choice(Game_Board,Resource::Iron);
+    }else if(!indicator && Target == Resource::Iron){
+        Choice = optimal_Choice(Game_Board,Resource::Iron);
+    }
+    return Choice;
+}
+
+int AI::Max_Soilder(){
+    int limit_gold = get_gold() / 20;
+    int limit_iron = get_iron() / 5;
+    if(limit_gold > limit_iron){
+        return get_population()>limit_iron? limit_iron:get_population() ;
+    }else{
+        return get_population()>limit_gold? limit_gold:get_population() ;
+    }
 }

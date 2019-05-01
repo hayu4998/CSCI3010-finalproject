@@ -28,6 +28,10 @@ public:
 
     int get_belongs(){return belongs_;}
 
+    bool get_Is_Active_Player1(){return Is_Active_Player1_;}
+
+    bool get_Is_Active_Player2(){return Is_Active_Player2_;}
+
     void Active_Land(bool p){p?Is_Active_Player1_ = true : Is_Active_Player2_ = true;}
 
     void Deactive_Land(){Is_Active_Player1_ = false; Is_Active_Player2_ = false;}

@@ -25,6 +25,7 @@ public:
 
     void switch_Player();
 
+    void AI_Turn_Iterator();
 
 private slots:
     void Land_Clicked_Slot(Land * L);
@@ -45,11 +46,15 @@ private slots:
 
     void on_Player2_Train_Soilder_Button_clicked();
 
-    void Game_Over_Slot();
+    void Game_Over_Slot(bool winner);
 
     void on_Reset_Button_clicked();
 
     void Turn_Update_Slot(int Turn);
+
+    void on_Simulate_Slide_Bar_valueChanged(int value);
+
+    void on_Simulation_Start_Button_clicked();
 
 signals:
     void Start_Button_Clicked(bool p1,bool p2);
@@ -70,6 +75,12 @@ private:
     bool breaker_;
 
     bool player_turn_;
+
+    int Simulations_Left_;
+
+    int Player1_win_count;
+
+    int Player2_win_count;
 };
 
 #endif // MAINWINDOW_H

@@ -24,6 +24,16 @@ void Board::setBoard(bool p1,bool p2){
     P1_ = Player::Player_Factory(p1_);
     P2_ = Player::Player_Factory(p2_);
 
+    if(!p2_){
+        qDebug()<<"AI_Created";
+        connect(P2_,&Player::take_turn,this, &Board::AI_Choice_Slot);
+        //connect(P2_,&Player::train_soldiers,this,&Board::AI_Train_Soldier);
+    }
+    if(!p1_){
+        connect(P1_,&Player::take_turn,this, &Board::AI_Choice_Slot);
+        //connect(P1_,&Player::train_soldiers,this,&Board::AI_Train_Soldier);
+    }
+
     qDebug()<<"Start setting board";
     //initial cells
     for(int i = 0; i < 8; i++){
@@ -40,7 +50,7 @@ void Board::setBoard(bool p1,bool p2){
             }
         }
     }
-    qDebug()<<"Start setting avaliable slots";
+    //qDebug()<<"Start setting avaliable slots";
 
     //active aviable squares
     player_turn_ = true;
@@ -55,8 +65,6 @@ void Board::setBoard(bool p1,bool p2){
 }
 
 void Board::taketurn(bool type){
-
-
 
     if(update_resources(Stored_Land_,type)){
         Players_Resource_Grow();
@@ -92,8 +100,18 @@ void Board::taketurn(bool type){
     End_Game();
     std::cout<<"turn: "<<turn_<<std::endl;
     turn_++;
+
     Turn_Update_Signal(turn_);
+
     Stored_Land_ = Null_Land_;
+
+    if(player_turn_ && !p1_){
+
+        P1_->Choose(Play_board_);
+    }else if(!player_turn_ && !p2_){
+        qDebug()<<"AI_Choose_called";
+        P2_->Choose(Play_board_);
+    }
 }
 
 void Board::active_land_near_by(int x, int y){
@@ -119,12 +137,12 @@ void Board::reactive_land_near_by(int x, int y, bool player){
     }
 }
 
-void Board::Land_Clicked_Slot(Land *L, bool player){
+void Board::Land_Clicked_Slot(Land *L){
 
     if(L == Null_Land_){
 
         Stored_Land_ = L;
-        if(player){
+        if(player_turn_){
             QColor C;
             C = QColor(255,200,0);
             L -> Set_Color(C);
@@ -147,7 +165,7 @@ void Board::Land_Clicked_Slot(Land *L, bool player){
         Stored_Land_->Set_Color(Default);
         Stored_Land_ = L;
 
-        if(player){
+        if(player_turn_){
             QColor C;
             C = QColor(255,200,0);
             L -> Set_Color(C);
@@ -166,6 +184,7 @@ void Board::Start_Button_Clicked_Slot(bool p1, bool p2){
         if(Stored_Land_->get_belongs() == 0){
             taketurn(true);
         }else{
+            //qDebug()<<"Conducting War";
             taketurn(false);
         }
 
@@ -263,27 +282,29 @@ void Board::End_Game(){
     P2 = P2_;
 
     QMessageBox M;
+
+    //winning criterias
     if(turn_>12 && turn_<20){
-        if(P1->get_gold() <= P2->get_gold()/2){
-            M.setText("Game Over");
-            M.setInformativeText("Player 2 win with Economic Overthrow");
-            M.exec();
-            emit Game_Over_Signal();
-        }else if(P2->get_gold() <= P1->get_gold()/2){
-            M.setText("Game Over");
-            M.setInformativeText("Player 1 win with Economic Overthrow");
-            M.exec();
-            emit Game_Over_Signal();
-        }else if(P1->get_solider() < P2->get_solider()/2){
+        if(P1->get_solider() < P2->get_solider()/2 ){
             M.setText("Game Over");
             M.setInformativeText("Player 2 win with Military deterrence");
             M.exec();
-            emit Game_Over_Signal();
+            emit Game_Over_Signal(false);
         }else if(P2->get_solider() < P1->get_solider()/2){
             M.setText("Game Over");
             M.setInformativeText("Player 1 win with Military deterrence");
             M.exec();
-            emit Game_Over_Signal();
+            emit Game_Over_Signal(true);
+        }else if(P1->get_gold() <= P2->get_gold()/2){
+            M.setText("Game Over");
+            M.setInformativeText("Player 2 win with Economic Overthrow");
+            M.exec();
+            emit Game_Over_Signal(false);
+        }else if(P2->get_gold() <= P1->get_gold()/2){
+            M.setText("Game Over");
+            M.setInformativeText("Player 1 win with Economic Overthrow");
+            M.exec();
+            emit Game_Over_Signal(true);
         }else{
             int P1_Land_count = 0;
             int P2_Land_count = 0;
@@ -300,12 +321,12 @@ void Board::End_Game(){
                 M.setText("Game Over");
                 M.setInformativeText("Player 2 win with Desperate Potential(2X Land)");
                 M.exec();
-                emit Game_Over_Signal();
+                emit Game_Over_Signal(false);
             }else if(P2_Land_count <= P1_Land_count/2){
                 M.setText("Game Over");
                 M.setInformativeText("Player 1 win with Desperate Potential(2X Land)");
                 M.exec();
-                emit Game_Over_Signal();
+                emit Game_Over_Signal(true);
             }
         }
 
@@ -314,20 +335,31 @@ void Board::End_Game(){
             M.setText("Game Over");
             M.setInformativeText("Player 2 win in the final battle with more soldiers");
             M.exec();
+            emit Game_Over_Signal(false);
         }else if(P1->Max_Soilder() > P2->Max_Soilder()){
             M.setText("Game Over");
             M.setInformativeText("Player 1 win in the final battle with more soldiers");
             M.exec();
+            emit Game_Over_Signal(true);
         }else{
             M.setText("Game Over");
             M.setInformativeText("Draw");
             M.exec();
+            emit Game_Over_Signal(false);
         }
-        emit Game_Over_Signal();
+
     }
 }
 
+void Board::AI_Choice_Slot(Land* L){
+    qDebug()<<"AI Signal Received";
+    Land_Clicked_Slot(L);
+    Start_Button_Clicked_Slot(p1_,p2_);
+};
 
+void Board::AI_Start_Game(){
+    P1_->Choose(Play_board_);
+}
 
 
 

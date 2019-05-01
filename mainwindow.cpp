@@ -88,9 +88,12 @@ void MainWindow::on_Start_Button_clicked()
         ui->Player2_Train_Soilder_Button->setEnabled(false);
         ui->Player2_Soilder_Persentage_Bar->setEnabled(false);
         Is_Start_Turn_ = false;
+        if(Game_Mode_ == 3){
+            Game_Board_->AI_Start_Game();
+        }
     }else{
         player_turn_ = !player_turn_;
-        if(player_turn_){
+        if(player_turn_){Game_Mode_ = 3;
             ui->Player2_Train_Soilder_Button->setEnabled(false);
             ui->Player2_Soilder_Persentage_Bar->setEnabled(false);
             ui->Player1_Train_Soilder_Button->setEnabled(true);
@@ -166,13 +169,22 @@ void MainWindow::on_Player2_Train_Soilder_Button_clicked()
     //qDebug()<<ui->Player1_Soilder_Persentage_Bar->value();
 }
 
-void MainWindow::Game_Over_Slot(){
+void MainWindow::Game_Over_Slot(bool winner){
     qDebug()<<"EndGame Received";
-    ui->Start_Button->setEnabled(false);
+    if(Game_Mode_ == 3){
+        winner?Player1_win_count++:Player2_win_count++;
+        Simulations_Left_--;
+        AI_Turn_Iterator();
+    }else{
+        ui->Start_Button->setEnabled(false);
+    }
+
 }
 
 void MainWindow::on_Reset_Button_clicked()
 {
+    Game_Board_->~Board();
+
     QGraphicsView * view = ui->graphicsView;
 
     scene = new QGraphicsScene;
@@ -181,16 +193,64 @@ void MainWindow::on_Reset_Button_clicked()
 
     ui->Player1_Text_Display->setText("");
     ui->Player2_Text_Display->setText("");
+    ui->Turn_Indicator_Label->setText("Turn");
 
     ui->Start_Button->setEnabled(true);
+
+    Board* game = new Board;
+
+    Game_Board_ = game;
+
+    Is_Start_Turn_ = true;
+
+    Game_Mode_ = 5;
+
+    breaker_ = true;
+
+    player_turn_ = true;
+
+    ui->Singleplayer_Mode_Button->setText("Singleplayer");
+    ui->Multiplayer_Mode_Button->setText("Multiplayer");
+
+    connect(this,&MainWindow::Start_Button_Clicked,Game_Board_,&Board::Start_Button_Clicked_Slot);
+    connect(Game_Board_,&Board::Update_Player_Data_Signal, this,&MainWindow::Player_Data_Display_Slot);
+    connect(Game_Board_,&Board::Game_Over_Signal,this, &MainWindow::Game_Over_Slot);
+    connect(Game_Board_,&Board::Turn_Update_Signal, this, &MainWindow::Turn_Update_Slot);
 
 }
 
 void MainWindow::Turn_Update_Slot(int Turn){
     QString S = ("Turn: " +std::to_string(Turn)).c_str();
     if(Turn == 9){
-        S = S + "\n BEWARE: Sudden Death start in next turn! Train your soldiers!";
+        S = S + "\n BEWARE: Sudden Death start in next turn! \nTrain your soldiers!";
     }
     ui->Turn_Indicator_Label->setText(S);
 
+}
+
+void MainWindow::on_Simulate_Slide_Bar_valueChanged(int value){
+    QString S = "AI Simulation: ";
+    S = S + std::to_string(value).c_str();
+    S = S + " Games.";
+    ui->AI_Turn_Label->setText(S);
+}
+
+void MainWindow::on_Simulation_Start_Button_clicked()
+{
+    Simulations_Left_ = ui->Simulate_Slide_Bar->value();
+    Player1_win_count = 0;
+    Player2_win_count = 0;
+    AI_Turn_Iterator();
+}
+
+void MainWindow::AI_Turn_Iterator(){
+    if(Simulations_Left_ == 0){
+        return;
+    }
+
+    Simulations_Left_ --;
+    on_Reset_Button_clicked();
+    qDebug()<<"Reset Successful";
+    Game_Mode_ = 3;
+    on_Start_Button_clicked();
 }

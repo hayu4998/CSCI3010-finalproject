@@ -19,7 +19,7 @@ public:
 
     int get_solider(){return soldier_;}
 
-    int Max_Soilder();
+    virtual int Max_Soilder();
 
     void Transform_Soldier(int soldier);
 
@@ -35,9 +35,29 @@ public:
 
     QString Output_Data();
 
+    int get_forest(){return forest_;}
+
+    int get_gold_mine(){return gold_mine_;}
+
+    int get_iron_mine(){return iron_mine_;}
+
+    int get_iron(){return iron_;}
+
+    int get_population(){return population_;}
+
+    static int get_turn(){return turn_;}
+
+    static bool get_player_turn(){return player_turn_;}
+
+    void Choose(Land *Array[8][8]);
+
+    Land* optimal_Choice(Land *Array[8][8], Resource Target);
+
 signals:
 
-    void take_turn();
+    void take_turn(Land * target);
+
+    void train_soldiers(int num);
 
 private:
 
@@ -68,9 +88,7 @@ class AI: public Player{
 public:
     AI():Player(){}
 
-    void Choose();
-
-    int target_;
+    int Max_Soilder() override;
 };
 
 #endif // PLAYER_H

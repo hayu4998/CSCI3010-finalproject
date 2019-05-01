@@ -26,8 +26,6 @@ public:
 
     bool update_resources(Land *L, bool type);
 
-    Land *Play_board_[8][8];
-
     QString Update_Player_Data(bool player_turn);
 
     int Get_Player_Soldier_Option(bool player);
@@ -38,17 +36,25 @@ public:
 
     void End_Game();
 
+    void AI_Start_Game();
+
+    Land *Play_board_[8][8];
+
 public slots:
 
-    void Land_Clicked_Slot(Land *L, bool player);
+    void Land_Clicked_Slot(Land *L);
 
     void Start_Button_Clicked_Slot(bool p1, bool p2);
+
+    void AI_Choice_Slot(Land* L);
+
+    //void AI_Train_Soldier(int num);
 
 signals:
 
     void Update_Player_Data_Signal(QString Output, bool player, int soilders);
 
-    void Game_Over_Signal();
+    void Game_Over_Signal(bool winner);
 
     void Turn_Update_Signal(int turn);
 
