@@ -48,7 +48,7 @@ public slots:
 
     void AI_Choice_Slot(Land* L);
 
-    //void AI_Train_Soldier(int num);
+
 
 signals:
 
@@ -57,6 +57,10 @@ signals:
     void Game_Over_Signal(int result);
 
     void Turn_Update_Signal(int turn);
+
+    void message_carrier(std::string Winning_message);
+
+    void Start_Button_Clicked_Signal();
 
 private:
 

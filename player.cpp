@@ -61,6 +61,7 @@ bool Player::Add_Land(Land *L){
 }
 bool AI::Add_Land(Land *L){
     if( get_lumber() < 150){
+        qDebug()<<"AI Debug called";
         return false;
     }
     if(get_gold()<10){
@@ -87,7 +88,7 @@ void Player::Change_Resource(std::string s, int quantity){
 void Player::increment_resource(Resource R){
     if(R == Resource::Forest){forest_++;}
     if(R == Resource::Gold){gold_mine_++;}
-    if(R == Resource::Iron){forest_++;}
+    if(R == Resource::Iron){iron_mine_++;}
 }
 
 void Player::Lost_Land(Land *L){
@@ -190,8 +191,8 @@ void Player::Choose(Land * Game_Board[8][8]){
 
     Land * choice = optimal_Choice(Game_Board,Target);
 
-    if(get_turn() == 9 || get_turn() == 10){
-        Transform_Soldier(Max_Soilder());
+    if(get_turn() == 8 || get_turn() == 9){
+        Transform_Soldier(this->Max_Soilder());
     }
 
     emit take_turn(choice);
@@ -233,9 +234,9 @@ int AI::Max_Soilder(){
     int limit_gold = get_gold() / 20;
     int limit_iron = get_iron() / 5;
     if(limit_gold > limit_iron){
-        return get_population()>limit_iron? limit_iron:get_population() ;
+        return get_population()>limit_iron? limit_iron/2:get_population() ;
     }else{
-        return get_population()>limit_gold? limit_gold:get_population() ;
+        return get_population()>limit_gold? limit_gold/2:get_population() ;
     }
 }
 

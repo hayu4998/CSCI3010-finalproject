@@ -64,7 +64,7 @@ void Board::setBoard(bool p1,bool p2){
     Player::Set_player_turn(player_turn_);
 
     Is_Start_ = false;
-
+    Stored_Land_ = Null_Land_;
     //setting Player data display
     emit Update_Player_Data_Signal(Update_Player_Data(true),true,Get_Player_Soldier_Option(true));
     emit Update_Player_Data_Signal(Update_Player_Data(false),false, Get_Player_Soldier_Option(false));
@@ -116,7 +116,7 @@ void Board::taketurn(bool type){
     //qDebug()<<"Land class turn:"<<Stored_Land_->get_player_turn();
 
     Stored_Land_ = Null_Land_;
-    if(!p1_ && !p2_ && result == 0){
+    if((!p1_ || !p2_) && result == 0){
         if(player_turn_ && !p1_){
 
             P1_->Choose(Play_board_);
@@ -210,7 +210,7 @@ bool Board::update_resources(Land *L, bool type){
     if(L == Null_Land_){return false;}
     bool result;
     if(type){
-
+        qDebug()<<"Add Land to Player";
         result = player_turn_?P1_->Add_Land(L):P2_->Add_Land(L);
 
     }else{
@@ -220,10 +220,10 @@ bool Board::update_resources(Land *L, bool type){
 
         if(player_turn_){
             attack = P1_;
-            attack = P2_;
-        }else{
-            attack = P1_;
             Defence = P2_;
+        }else{
+            Defence = P1_;
+            attack = P2_;
         }
 
         //updating resource if conqur
@@ -296,33 +296,28 @@ int Board::End_Game(){
     P1 = P1_ ;
     P2 = P2_;
 
-    QMessageBox M;
+    std::string M;
     int result = 0;
 
     //winning criterias
-    if(turn_>11 && turn_<20){
+    if(turn_>9 && turn_<20){
         if(P1->get_solider() < P2->get_solider()/2 ){
-            M.setText("Game Over");
-            M.setInformativeText("Player 2 win with Military deterrence");
-            M.exec();
+
+            M = "Player 2 win with Military deterrence";
             result = 2;
 
         }else if(P2->get_solider() < P1->get_solider()/2){
-            M.setText("Game Over");
-            M.setInformativeText("Player 1 win with Military deterrence");
-            M.exec();
+            M="Player 1 win with Military deterrence";
             result = 1;
 
         }else if(P1->get_gold() <= P2->get_gold()/2){
-            M.setText("Game Over");
-            M.setInformativeText("Player 2 win with Economic Overthrow");
-            M.exec();
+            M="Player 2 win with Economic Overthrow";
             result = 2;
 
         }else if(P2->get_gold() <= P1->get_gold()/2){
-            M.setText("Game Over");
-            M.setInformativeText("Player 1 win with Economic Overthrow");
-            M.exec();
+
+            M="Player 1 win with Economic Overthrow";
+
             result = 1;
 
         }else{
@@ -338,15 +333,14 @@ int Board::End_Game(){
                 }
             }
             if(P1_Land_count <= P2_Land_count/2){
-                M.setText("Game Over");
-                M.setInformativeText("Player 2 win with Desperate Potential(2X Land)");
-                M.exec();
+
+                M ="Player 2 win with Desperate Potential(2X Land)";
+
                 result = 2;
 
             }else if(P2_Land_count <= P1_Land_count/2){
-                M.setText("Game Over");
-                M.setInformativeText("Player 1 win with Desperate Potential(2X Land)");
-                M.exec();
+
+                M= "Player 1 win with Desperate Potential(2X Land)";
                 result = 1;
 
             }
@@ -354,25 +348,27 @@ int Board::End_Game(){
 
     }else if(turn_ == 20){
         if(P1->Max_Soilder() < P2->Max_Soilder()){
-            M.setText("Game Over");
-            M.setInformativeText("Player 2 win in the final battle with more soldiers");
-            M.exec();
+
+            M="Player 2 win in the final battle with more soldiers";
+
             result = 2;
 
         }else if(P1->Max_Soilder() > P2->Max_Soilder()){
-            M.setText("Game Over");
-            M.setInformativeText("Player 1 win in the final battle with more soldiers");
-            M.exec();
+            M="Player 1 win in the final battle with more soldiers";
+
             result = 1;
 
         }else{
-            M.setText("Game Over");
-            M.setInformativeText("Draw");
-            M.exec();
+
+            M="Draw";
+
             result = 3;
 
         }
 
+    }
+    if(result !=0){
+        emit message_carrier(M);
     }
     return result;
 }
@@ -380,7 +376,8 @@ int Board::End_Game(){
 void Board::AI_Choice_Slot(Land* L){
     qDebug()<<"AI Signal Received";
     Land_Clicked_Slot(L);
-    Start_Button_Clicked_Slot(p1_,p2_);
+    //Start_Button_Clicked_Slot(p1_,p2_);
+    Start_Button_Clicked_Signal();
 };
 
 void Board::AI_Start_Game(){

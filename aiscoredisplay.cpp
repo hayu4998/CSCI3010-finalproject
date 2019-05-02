@@ -10,12 +10,12 @@ AIScoreDisplay::AIScoreDisplay(int location, int width, int player){
 }
 
 QRectF AIScoreDisplay::boundingRect() const{
-    return QRectF(0,location_,width_+100,height_);
+    return QRectF(-300,2*location_,width_+100,height_);
 }
 
 QPainterPath AIScoreDisplay::shape() const{
     QPainterPath path;
-    path.addRect(0,location_,width_+100, height_);
+    path.addRect(-300,2*location_,width_+100, height_);
     return path;
 }
 void AIScoreDisplay::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
@@ -23,10 +23,10 @@ void AIScoreDisplay::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
     QBrush b = painter->brush();
     painter->setBrush(QBrush(color_));
-    painter->drawRect(QRectF(0, 0, width_+100, height_));
+    painter->drawRect(QRectF(-300, 2*location_, width_+100, height_));
 
     painter->setBrush(b);
 
-    //QString Display_text = ("Player " + std::to_string(player_) + ": " + std::to_string(width_/10) + "->").c_str();
-    //painter->drawText(QRectF(10+location_, 0, width_, height_),Qt::AlignCenter, Display_text);
+    QString Display_text = ("Player " + std::to_string(player_) + " win -> " + std::to_string(width_/5) ).c_str();
+    painter->drawText(QRectF(-300, 2*location_, width_+100, height_),Qt::AlignLeft, Display_text);
 }

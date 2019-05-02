@@ -56,6 +56,10 @@ private slots:
 
     void on_Simulation_Start_Button_clicked();
 
+    void Message_receiver(std::string);
+
+    void AI_Start_Click_Slot();
+
 signals:
     void Start_Button_Clicked(bool p1,bool p2);
 
@@ -88,6 +92,7 @@ private:
 
     AIScoreDisplay *Player2_Score_display_;
 
+    std::string Winning_Message_;
 };
 
 #endif // MAINWINDOW_H

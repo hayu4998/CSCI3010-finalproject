@@ -14,7 +14,7 @@ public:
 
     AIScoreDisplay(int location, int width, int player);
 
-    void change_length(int width){width_ = width*5+100;update();}
+    void change_length(int width){width_ = width*5;update();}
 
     QRectF boundingRect() const override;
 

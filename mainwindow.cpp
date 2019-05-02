@@ -38,6 +38,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     player_turn_ = true;
 
+    Winning_Message_ = "Initial text";
+
     ui->Simulate_Slide_Bar->setTickInterval(5);
     ui->Simulate_Slide_Bar->setMaximum(50);
     ui->Simulate_Slide_Bar->setMinimum(1);
@@ -52,6 +54,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(Game_Board_,&Board::Update_Player_Data_Signal, this,&MainWindow::Player_Data_Display_Slot);
     connect(Game_Board_,&Board::Game_Over_Signal,this, &MainWindow::Game_Over_Slot);
     connect(Game_Board_,&Board::Turn_Update_Signal, this, &MainWindow::Turn_Update_Slot);
+    connect(Game_Board_,&Board::message_carrier,this, &MainWindow::Message_receiver);
+    connect(Game_Board_,&Board::Start_Button_Clicked_Signal,this,&MainWindow::AI_Start_Click_Slot);
 }
 
 MainWindow::~MainWindow()
@@ -63,6 +67,10 @@ void MainWindow::Land_Clicked_Slot(Land * L){
     qDebug()<< L->get_x();
     qDebug()<< L->get_y();
 }
+
+void MainWindow::AI_Start_Click_Slot(){
+    on_Start_Button_clicked();
+};
 
 void MainWindow::on_Start_Button_clicked()
 {
@@ -103,7 +111,7 @@ void MainWindow::on_Start_Button_clicked()
         }
     }else{
         player_turn_ = !player_turn_;
-        if(player_turn_){Game_Mode_ = 3;
+        if(player_turn_){
             ui->Player2_Train_Soilder_Button->setEnabled(false);
             ui->Player2_Soilder_Persentage_Bar->setEnabled(false);
             ui->Player1_Train_Soilder_Button->setEnabled(true);
@@ -179,6 +187,11 @@ void MainWindow::on_Player2_Train_Soilder_Button_clicked()
     //qDebug()<<ui->Player1_Soilder_Persentage_Bar->value();
 }
 
+void MainWindow::Message_receiver(std::string winner_message){
+    qDebug()<<"Message received";
+    Winning_Message_ = winner_message;
+}
+
 void MainWindow::Game_Over_Slot(int result){
     qDebug()<<"EndGame Received";
     if(Game_Mode_ == 3){
@@ -191,7 +204,14 @@ void MainWindow::Game_Over_Slot(int result){
             Player2_win_count++;
         }
 
+        Player1_Score_display_->change_length(Player1_win_count);
+        Player2_Score_display_->change_length(Player2_win_count);
+
         AI_scene->update();
+        QMessageBox *M = new QMessageBox;
+        M->setText("Game Over");
+        M->setInformativeText(Winning_Message_.c_str());
+        M->exec();
 
         if(Simulations_Left_ != 0){
             AI_Turn_Iterator();
@@ -199,7 +219,13 @@ void MainWindow::Game_Over_Slot(int result){
 
 
     }else{
+
+        qDebug()<<"Normal Game END";
         ui->Start_Button->setEnabled(false);
+        QMessageBox *M = new QMessageBox;
+        M->setText("Game Over");
+        M->setInformativeText(Winning_Message_.c_str());
+        M->exec();
     }
 
 }
@@ -234,6 +260,8 @@ void MainWindow::on_Reset_Button_clicked()
 
     player_turn_ = true;
 
+    Winning_Message_ = "Initial Message";
+
     ui->Singleplayer_Mode_Button->setText("Singleplayer");
     ui->Multiplayer_Mode_Button->setText("Multiplayer");
 
@@ -245,7 +273,8 @@ void MainWindow::on_Reset_Button_clicked()
     connect(Game_Board_,&Board::Update_Player_Data_Signal, this,&MainWindow::Player_Data_Display_Slot);
     connect(Game_Board_,&Board::Game_Over_Signal,this, &MainWindow::Game_Over_Slot);
     connect(Game_Board_,&Board::Turn_Update_Signal, this, &MainWindow::Turn_Update_Slot);
-
+    connect(Game_Board_,&Board::message_carrier,this, &MainWindow::Message_receiver);
+    connect(Game_Board_,&Board::Start_Button_Clicked_Signal,this,&MainWindow::AI_Start_Click_Slot);
 }
 
 void MainWindow::Turn_Update_Slot(int Turn){
@@ -270,10 +299,21 @@ void MainWindow::on_Simulation_Start_Button_clicked()
     Player1_win_count = 0;
     Player2_win_count = 0;
     //update Winning graph
+
+    QGraphicsView * AI_view = ui->AI_Simulation_Graphic_View;
+
+    AI_scene = new QGraphicsScene;
+
+    AI_view->setScene(AI_scene);
+
+
     Player1_Score_display_ = new AIScoreDisplay(10,Player1_win_count,1);
     Player2_Score_display_ = new AIScoreDisplay(-10,Player2_win_count,2);
     AI_scene->addItem(Player1_Score_display_);
     AI_scene->addItem(Player2_Score_display_);
+
+
+
     AI_Turn_Iterator();
 }
 
