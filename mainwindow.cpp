@@ -109,7 +109,7 @@ void MainWindow::on_Start_Button_clicked()
 
             Game_Board_->AI_Start_Game();
         }
-    }else{
+    }else if(breaker_){
         player_turn_ = !player_turn_;
         if(player_turn_){
             ui->Player2_Train_Soilder_Button->setEnabled(false);
